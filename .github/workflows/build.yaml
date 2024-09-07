@@ -1,25 +1,18 @@
-
+name: CI
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
       types: [opened, synchronize, reopened]
-name: CI + Sonar
 jobs:
-  sonarcloud:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 16
-    - name: Install dependencies
-      run: npm install
-    - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "^18"
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
