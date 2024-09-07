@@ -7,6 +7,7 @@ var cors = require('cors');
 
 //importo router
 var indexRouter = require('./src/routes/index');
+var userRouter = require('./src/routes/user.route'); 
 
 //instancio el servidor
 var app = express();
@@ -24,6 +25,7 @@ app.use(cookieParser());
 
 //Indico las rutas de los endpoint
 app.use('/', indexRouter);
+app.use('/users', userRouter);
 
 
 app.use(function (req, res, next) {
