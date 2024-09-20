@@ -4,7 +4,8 @@
   "description": "eventify_inhouse_be",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "test": "jest"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -19,6 +20,7 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^1.19.4"
   }
 }
