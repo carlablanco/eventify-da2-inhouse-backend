@@ -12,8 +12,9 @@ function verifyToken(req, res, next) {
     token = req.header('Authorization').slice(7);
 
     if (NODE_ENV === 'development') {
-        return res.status(200).json({ status: 'success', message: 'Token verified' });
-    }
+        req.userId = 333;
+        return next();
+    } 
 
     try {
         const decoded = jwt.verify(token, SECRET_KEY_JWT);
@@ -24,7 +25,7 @@ function verifyToken(req, res, next) {
         }
 
         req.userId = decoded.userId;
-        next();
+        return next();
     } catch (error) {
         res.status(401).json({ status: 'fail', message: 'Invalid token' });
     }
