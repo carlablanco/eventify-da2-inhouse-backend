@@ -20,13 +20,14 @@ exports.all = async function (req, res) {
 }
 
 exports.userById = async function (req, res) {
-    if (!req.body.id){
+    
+    if (!req.params.id){
         return res.status(diccionarioMensajes[10].statusHttp).json(
             {status: diccionarioMensajes[10].statusHttp, message: diccionarioMensajes[10].message})
     }
 
     try {
-        var User = await UserService.getUserById(req.body.id)
+        var User = await UserService.getUserById(req.params.id)
         
         return res.status(diccionarioMensajes[0].statusHttp).json(
             {status: diccionarioMensajes[0].statusHttp, data: User, message: diccionarioMensajes[0].message});
