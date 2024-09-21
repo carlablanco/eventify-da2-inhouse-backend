@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
-const {
-    MONGO_USER,
-    MONGO_PASS,
-    MONGO_CLUSTER,
-    MONGO_APP_NAME,
-    MONGO_DB
-} = require("../constants");
+
+const { MONGO_USER, MONGO_PASS, MONGO_CLUSTER, MONGO_DB, MONGO_APP_NAME } = process.env;
 
 const uri = "mongodb+srv://"+MONGO_USER+":"+MONGO_PASS+"@"+MONGO_CLUSTER+".arnnf.mongodb.net/"+MONGO_DB+"?retryWrites=true&w=majority&appName="+MONGO_APP_NAME+"";
 

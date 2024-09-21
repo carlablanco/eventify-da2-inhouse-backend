@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
-const {
-    SECRET_KEY_JWT,
-    NODE_ENV
-} = require("../constants");
+
+const { SECRET_KEY_JWT, NODE_ENV } = process.env;
 
 function verifyToken(req, res, next) {
     let token = req.header('Authorization');
