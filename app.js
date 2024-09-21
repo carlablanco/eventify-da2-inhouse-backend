@@ -1,49 +1,37 @@
-//Express
-var express = require('express');
-var cookieParser = require('cookie-parser');
+const cors = require("cors");
+const express = require("express");
+const bodyParser = require('body-parser')
 
-//incorporo cors
-var cors = require('cors');
+const users = require("./src/routes/v1/users");
+const login = require("./src/routes/v1/login");
+const healthCheck = require("./src/routes/v1/healthCheck");
 
-//importo router
-var indexRouter = require('./src/routes/index');
-var userRouter = require('./src/routes/user.route'); 
+const {
+  PORT, 
+  NODE_ENV, 
+  SECRET_KEY_JWT, 
+  REFRESH_TOKEN_SIZE, 
+  TOKEN_EXPIRATION, 
+ } = require("constants");
 
-//instancio el servidor
-var app = express();
+// var userRouter = require('./src/routes/user.route'); 
 
-//engine que permite renderizar paginas web
-app.set('view engine', 'jade');
-app.use(express.json());
-app.use(express.urlencoded({
-  extended: false
-}));
+// Instancio express
+const app = express();
+// Defino el tratamiento del body
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
-//aplico cors
+// Configuro cors
+const port = PORT || 3000;
 app.use(cors());
-app.use(cookieParser());
 
-//Indico las rutas de los endpoint
-app.use('/', indexRouter);
-app.use('/users', userRouter);
+// Defino rutas
+app.use('/api/v1/login', login);
+app.use('/api/v1/users', users);
+app.use('/api/v1/status', healthCheck);
 
-
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:4000");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-  
+// Inicio servidor
+app.listen(port, () => {
+    console.log(`Servidor escuchando en http://localhost:${port}`);
 });
-
-
-// Setup server port
-var port = process.env.PORT || 8080;
-// Escuchar en el puerto
-app.listen(port,()=>{
-    console.log('Servidor iniciado en el puerto ',port);
-});
-
-
-module.exports = app;
-
-
