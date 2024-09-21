@@ -1,17 +1,16 @@
 const UserService = require('../service/user.service');
 const diccionarioMensajes = require('../utils/diccionarioMensajes');
 
+const connectDB = require('../database/mongoConnect');
+
+const User = require('../models/Users');
+connectDB();
+
 exports.all = async function (req, res) {
 
     try {
-        const users = []
-        for (let i = 1; i <= 10; i++) {
-            users.push({
-                id: i,
-                name: `usuario ${i}`,
-                email: `usuario${i}@eventify.com`,
-            });
-        }
+        const users = await User.find();
+
         return res.status(200).json(users)
     } catch (e) {
         return res.status(500).json({ message: e.message })
