@@ -12,7 +12,7 @@ const {
   SECRET_KEY_JWT, 
   REFRESH_TOKEN_SIZE, 
   TOKEN_EXPIRATION, 
- } = require("constants");
+ } = require("./src/constants");
 
 // var userRouter = require('./src/routes/user.route'); 
 
