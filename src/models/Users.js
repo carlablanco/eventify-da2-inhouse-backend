@@ -1,13 +1,14 @@
-const mongoose = require('mongoose');
+const { Schema, model } = require("mongoose");
 
-// Definir el esquema flexible para la colección 'users'
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema(
+  {
     name: String,
     email: String,
-    password: String
-}, { strict: false });
+    password: String,
+  },
+  { strict: false },
+);
 
-// Verificar si el modelo ya está compilado o crearlo si no lo está
-const User = mongoose.models.User || mongoose.model('User', userSchema, 'users');
+const Users = model("Users", userSchema);
 
-module.exports = User;
+module.exports = Users;

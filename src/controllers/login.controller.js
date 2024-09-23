@@ -1,20 +1,50 @@
-const UserService = require('../service/user.service');
-const diccionarioMensajes = require('../utils/diccionarioMensajes');
+let instance = null;
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const UserService = require("../services/user.service");
+const AuthService = require("../services/auth.service");
 
-exports.login = async function (req, res) {
+const { SECRET_KEY_JWT } = process.env;
 
-    if (!req.query.cn || !req.query.pass){
-        return res.status(diccionarioMensajes[8].statusHttp).json(
-            {status: diccionarioMensajes[8].statusHttp, message: diccionarioMensajes[8].message})
+class LoginController {
+  static getInstance() {
+    if (!instance) {
+      return new LoginController();
     }
+    return instance;
+  }
 
+  async login(req, res) {
     try {
-        var User = await UserService.login(req.query.cn, req.query.pass)
-        
-        return res.status(diccionarioMensajes[0].statusHttp).json(
-            {status: diccionarioMensajes[0].statusHttp, data: User, message: diccionarioMensajes[0].message});
-    } catch (e) {
-        
-        return res.status(e.statusHttp).json({status: e.statusHttp, message: e.message});
+      const { email, password } = req.body;
+      let isUserRegistered = await AuthService.hasValidCredentials(
+        email,
+        password,
+      );
+      if (isUserRegistered) {
+        const user = await UserService.getUserByEmail(email);
+        const token = jwt.sign(user.toJSON(), SECRET_KEY_JWT, {
+          expiresIn: "1d",
+        });
+
+        return res.status(200).json({
+          status: 200,
+          token,
+          message: "Token created successfully.",
+        });
+      } else {
+        return res.status(401).json({
+          message: "Unauthorized.",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        method: "login",
+        message: err.message,
+      });
     }
+  }
 }
+
+module.exports = LoginController.getInstance();
