@@ -17,19 +17,28 @@ class LoginController {
   async login(req, res) {
     try {
       const { email, password } = req.body;
-      let isUserRegistered = await AuthService.hasValidCredentials(
-        email,
-        password,
-      );
-      if (isUserRegistered) {
-        const user = await UserService.getUserByEmail(email);
-        const token = jwt.sign(user.toJSON(), SECRET_KEY_JWT, {
+
+      //let isUserRegistered = await AuthService.hasValidCredentials( email, password );
+      // SNICOLINO: REEMPLAZO VALIDACION DE CREDENCIALES DE BBDD POR VALIDACION CON LDAP
+      let isUserRegistered = await AuthService.ldapValidCredentials( email, password );
+      console.log("LDAP-LOGIN = ", isUserRegistered );
+
+      //if (isUserRegistered) {
+      if (isUserRegistered.status == 0) {
+        //const user = await UserService.getUserByEmail(email);
+        //SNICOLINO: RECUPERO DATOS Y ROL DEL USUARIO DESDE LDAP
+        const user = await UserService.ldapGetUserByEmail(email);
+        console.log("LDAP-USER = ", user );
+
+        //const token = jwt.sign(user.toJSON(), SECRET_KEY_JWT, {
+        const token = jwt.sign(user, SECRET_KEY_JWT, {
           expiresIn: "1d",
         });
 
         return res.status(200).json({
           status: 200,
-          token,
+          user, 
+          token, 
           message: "Token created successfully.",
         });
       } else {
