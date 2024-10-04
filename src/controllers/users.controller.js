@@ -2,7 +2,6 @@ let instance = null;
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const UserService = require("../services/user.service");
-const AuthService = require("../services/auth.service");
 
 class UserController {
   static getInstance() {

@@ -29,13 +29,39 @@
  *           description: Unauthorized
  *        404:
  *           description: Not Found
+ * /api/v1/login/token:
+ *  post:
+ *     tags:
+ *       - Login
+ *     description: Validate JWT
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *        - name: jwt
+ *          description: JWT token
+ *          in: formData
+ *          required: true
+ *          type: string
+ *     responses:
+ *       200:
+ *         description: Return all users
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Error
  */
 
 const express = require("express");
 const router = express.Router();
 const LoginController = require("../../controllers/login.controller");
 const { check } = require("express-validator");
+const checkJwt = require("../../middlewares/auth.middleware");
 const checkFields = require("../../middlewares/field-validation.middleware");
+
+//Valida JWT del sessionStorage
+router.post("/token", checkJwt);
 
 //Loguea un usuario
 router.post(
