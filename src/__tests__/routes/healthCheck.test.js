@@ -1,6 +1,6 @@
 const request = require('supertest');
 const express = require('express');
-const healthRouter = require('../routes/v1/healthCheck'); // Ajusta la ruta según la ubicación de tu archivo
+const healthRouter = require('../../routes/v1/healthCheck'); 
 
 const app = express();
 app.use('/api/v1/health', healthRouter);
