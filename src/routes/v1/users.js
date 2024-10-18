@@ -49,20 +49,14 @@
  *           description: Unauthorized
  *        404:
  *           description: Not Found
+ *
  */
 
 const { Router } = require("express");
 const { check } = require("express-validator");
 const UserController = require("../../controllers/users.controller");
-const checkFields = require("../../middlewares/auth.middleware");
-const checkJwt = require("../../middlewares/field-validation.middleware");
+const checkFields = require("../../middlewares/field-validation.middleware");
 const router = Router();
-
-//Valida JWT del sessionStorage
-router.post("/jwt", checkJwt);
-
-//Devuelve todos los usuarios
-router.get("/", UserController.getUsers); //GET USUARIOS
 
 //Crea un usuario
 router.post(
@@ -75,6 +69,9 @@ router.post(
   ],
   UserController.createUser,
 ); //POST USUARIOS
+
+//Devuelve todos los usuarios
+router.get("/", UserController.getUsers); //GET USUARIOS
 
 //Devuelve un usuario por id
 router.get("/:id", UserController.getUserById); //GET USUARIOS BY ID
