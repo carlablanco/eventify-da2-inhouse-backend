@@ -57,6 +57,7 @@ const { check } = require("express-validator");
 const UserController = require("../../controllers/users.controller");
 const checkFields = require("../../middlewares/field-validation.middleware");
 const router = Router();
+const validateJwt = require('../../middlewares/auth.middleware');
 
 //Crea un usuario
 router.post(
@@ -71,7 +72,7 @@ router.post(
 ); //POST USUARIOS
 
 //Devuelve todos los usuarios
-router.get("/", UserController.getUsers); //GET USUARIOS
+router.get("/", validateJwt, UserController.getUsers); //GET USUARIOS
 
 //Devuelve un usuario por id
 router.get("/:id", UserController.getUserById); //GET USUARIOS BY ID

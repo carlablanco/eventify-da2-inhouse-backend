@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const UserModel = require("../models/Users");
 const { LDAP_IP, LDAP_OU, LDAP_DC } = process.env;
 var LdapClient = require('ldapjs-client');
-var client = new LdapClient({ url: LDAP_IP});
+var client = new LdapClient({ url: LDAP_IP });
 
 class AuthService {
 
@@ -18,21 +18,19 @@ class AuthService {
     }
   }
 
-  async ldapValidCredentials (email, password) {
-    
-    try {
+  async ldapValidCredentials(email, password) {
 
-      //var userDn = `cn=${email}` + ",ou=eventify_sa,dc=eventify,dc=local"
-      var userDn = `cn=${email}` + `,ou=${LDAP_OU},dc=${LDAP_DC}`
-      const ldapLogin = await client.bind( userDn , password);
+    try {
+      var userDn = `cn=${email},ou=usuarios,${LDAP_OU},dc=${LDAP_DC}`
+      const ldapLogin = await client.bind(userDn, password);
 
       return ldapLogin;
-    
-      } catch (err) {
-        console.log(err);
-        throw new Error("Error with LDAP credentials validation");
-      }
-    
+
+    } catch (err) {
+      console.log(err);
+      throw new Error("Error with LDAP credentials validation");
+    }
+
   }
 
 }
