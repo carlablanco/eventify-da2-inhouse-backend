@@ -19,7 +19,7 @@ describe("UserService", () => {
 
       UserModel.find.mockResolvedValue(mockUsers);
 
-      const users = await UserService.getUsers();
+      const users = await UserService.getModules();
 
       expect(users).toEqual(mockUsers);
       expect(UserModel.find).toHaveBeenCalled();
@@ -28,7 +28,7 @@ describe("UserService", () => {
     it("should throw an error if there is a problem fetching users", async () => {
       UserModel.find.mockRejectedValue(new Error("DB Error"));
 
-      await expect(UserService.getUsers()).rejects.toThrow("Error in getUsers Service");
+      await expect(UserService.getModules()).rejects.toThrow("Error in getUsers Service");
     });
   });
 
@@ -138,5 +138,5 @@ describe("UserService", () => {
     });
   });
 
-  
+
 });

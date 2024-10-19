@@ -7,6 +7,8 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 const connectDB = require("./src/database/mongoConnect");
 const users = require("./src/routes/v1/users");
+const modules = require("./src/routes/v1/modules");
+const roles = require("./src/routes/v1/roles");
 const login = require("./src/routes/v1/login");
 const healthCheck = require("./src/routes/v1/healthCheck");
 const morgan = require("morgan");
@@ -46,6 +48,8 @@ app.use(cors());
 // Defino rutas
 app.use("/api/v1/login", login);
 app.use("/api/v1/users", users);
+app.use("/api/v1/modules", modules);
+app.use("/api/v1/roles", roles);
 app.use("/api/v1/health", healthCheck);
 app.use(
   "/api/v1/",

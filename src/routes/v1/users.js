@@ -52,6 +52,56 @@
  *
  */
 
+/**
+ * @swagger
+ * /api/v1/users/{mail}:
+ *   get:
+ *     tags:
+ *       - Users
+ *     description: Get user info by mail
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: "mail"
+ *         in: "path"
+ *     responses:
+ *       200:
+ *         description: Return all users
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Error
+ *
+ */
+
+/**
+ * @swagger
+ * /api/v1/users/modules/{module}:
+ *   get:
+ *     tags:
+ *       - Users/Modules
+ *     description: Get users related in a module.
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: "module"
+ *         in: "path"
+ *       - name: "role"
+ *         in: "query"
+ *     responses:
+ *       200:
+ *         description: Return all users
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Error
+ *
+ */
+
 const { Router } = require("express");
 const { check } = require("express-validator");
 const UserController = require("../../controllers/users.controller");
@@ -72,9 +122,12 @@ router.post(
 ); //POST USUARIOS
 
 //Devuelve todos los usuarios
-router.get("/", validateJwt, UserController.getUsers); //GET USUARIOS
+router.get("/", UserController.getUsers); //GET USUARIOS
 
-//Devuelve un usuario por id
-router.get("/:id", UserController.getUserById); //GET USUARIOS BY ID
+//Devuelve un usuario por mail
+router.get("/:mail", UserController.getUserByMail); //GET USUARIO BY MAIL
+
+//Devuelve un usuario por mail
+router.get("/modules/:module", UserController.getUsersByModule); //GET USUARIO BY MAIL
 
 module.exports = router;

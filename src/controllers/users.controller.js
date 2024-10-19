@@ -13,12 +13,57 @@ class UserController {
 
   async getUsers(req, res) {
     try {
-      const users = await UserService.getUsers();
+      const users = await UserService.getModules();
       return res.status(200).json(users);
     } catch (err) {
       console.error(err);
       return res.status(500).json({
         method: "getUsers",
+        message: err,
+      });
+    }
+  }
+
+  async getUserByMail(req, res) {
+    try {
+      const mail = req.params.mail;
+      let user = await UserService.getUserByEmail(mail);
+      if (!user) {
+        return res.status(404).json({
+          method: "getUserByMail",
+          message: "Not Found",
+        });
+      }
+      return res.status(200).json(user);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        method: "getUserByMail",
+        message: err,
+      });
+    }
+  }
+
+  async getUsersByModule(req, res) {
+    try {
+      const module = req.params.module;
+      const role = req.query.role;
+      let users = [];
+      if (role)
+        users = await UserService.getUsersByRole(role, module);
+      else
+        users = await UserService.getUsersByModule(module);
+      if (users.length === 0) {
+        return res.status(404).json({
+          method: "getUsersByModule",
+          message: "Not Found",
+        });
+      }
+      return res.status(200).json(users);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        method: "getUsersByModule",
         message: err,
       });
     }
