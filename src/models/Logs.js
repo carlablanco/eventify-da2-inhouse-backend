@@ -8,13 +8,14 @@ const logsSchema = new Schema(
             required: true,
             trim: true,
         },
+        modules: Schema.Types.Mixed,
         module: {
             type: String,
-            required: true,
+            required: false,
         },
         role: {
             type: String,
-            required: true,
+            required: false,
         },
         action: {
             type: String,
@@ -32,13 +33,15 @@ const logsSchema = new Schema(
     },
 );
 
-const registerLog = async (username, module, role, action) => {
+const registerLog = async (username, modules, action, module, role) => {
     if (!Object.values(logTypes).includes(action))
         throw new Error("Log action described is invalid.");
 
     console.log(username, module, role, action);
-    Logs.insertMany({ username: username, module: module, role: role, action: action });
-    console.log(await Logs.find());
+    if (module)
+        Logs.insertMany({ username: username, modules, module: module, role: role, action: action });
+    else
+        Logs.insertMany({ username: username, modules, action: action });
 }
 
 const Logs = model("Logs", logsSchema);

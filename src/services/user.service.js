@@ -1,10 +1,6 @@
 const UserModel = require("../models/Users");
 const bcrypt = require("bcrypt");
-const { LDAP_IP, LDAP_DC, LDAP_OU } = process.env;
-var LdapClient = require('ldapjs-client');
-var client = new LdapClient({ url: LDAP_IP });
-
-const LDAP_MODULES_ROUTE_OBJECT = `ou=modulos,${LDAP_OU},dc=${LDAP_DC}`;
+const { client, LDAP_MODULES_ROUTE_OBJECT, LDAP_GLOBAL_ROUTE_OBJECT } = require('../utils/ldapConnect');
 
 class UserService {
   async getUsers() {
@@ -114,73 +110,47 @@ class UserService {
     }
   }
 
-
-
-
-  async ldapGetRoles(conexionLdap, dnUsuario) {
+  async getRolesByUserDn(userDn) {
     try {
       //Estructura actual DN Usuario, cuidado con DC=RD, modificar si se usa en arbol produccion: cn=tsultais,ou=usuarios,dc=rd,dc=eventify,dc=local
-      let opciones = {
-        filter: `(&(member=${dnUsuario}))`,
+      const options = {
+        filter: `(&(member=${userDn}))`,
         scope: "sub",
         attributes: ["cn"]
+      };
 
+      let result = await client.search(LDAP_MODULES_ROUTE_OBJECT, options)
+
+      const dictionary = {};
+
+      for (let i = 0; i < result.length; i++) {
+        let parsedModule = result[i].dn.split(",")[1].split("=")[1]
+
+        if (Object.keys(dictionary).includes(parsedModule))
+          dictionary[parsedModule].push(result[i].cn);
+        else
+          dictionary[parsedModule] = [result[i].cn];
       }
-
-      let resultado = await conexionLdap.search(LDAP_MODULES_ROUTE_OBJECT, opciones)
-
-      var diccionario = {}
-
-      for (var i = 0; i < resultado.length; i++) {
-
-        var moduloParseado = resultado[i].dn.split(",")[1].split("=")[1]
-
-        if (Object.keys(diccionario).includes(moduloParseado)) {
-          diccionario[moduloParseado].push(resultado[i].cn)
-        } else {
-          diccionario[moduloParseado] = [resultado[i].cn]
-        }
-      }
-      return diccionario;
+      return dictionary;
     }
     catch (err) {
       console.log(err);
-      throw new Error("Error in getUsers Service", err);
+      throw new Error("Error in getRolesByUserDn Service", err);
     }
   }
 
   async getUserByEmail(email) {
-    /*  console.log("USUARIOS POR ROL", await this.getUsersByRole("admin", "analitica"));
- 
-     //Todos los usuarios y roles de un módulo.
-     console.log("USUARIOS POR MODULO", await this.getUsersByModule("analitica"));
- 
-     //All users
-     console.log("USUARIOS", await this.getUsers()); */
-    //All modules
-    //console.log("MODULOS", await this.getModules());
-
-    /* console.log("ROLS POR MODULO", await this.getRolesByModule("eda"));
-    console.log("ROLS POR MODULO", await this.getRolesByModule("analitica"));
-
-    return; */
-
     try {
       const options = {
         filter: `(&(cn=${email}))`,
         scope: 'sub',
-        attributes: ['sn', 'cn', 'ou', 'telephoneNumber']
+        /* attributes: ['sn', 'cn', 'ou', 'telephoneNumber'] */
       };
+      const entries = await client.search(LDAP_GLOBAL_ROUTE_OBJECT, options);
 
-      const entries = await client.search(`dc=${LDAP_DC}`, options);
+      let roles = await this.getRolesByUserDn(entries[0].dn);
 
-
-      let response = await this.ldapGetRoles(client, entries[0].dn);
-      console.log("🚀 ~ file: auth.service.js:65 ~ AuthService ~ ldapValidCredentials ~ response:", response);
-
-
-      return { ...entries[0], modules: response };
-
+      return { ...entries[0], modules: roles };
     }
     catch (err) {
       console.log(err);

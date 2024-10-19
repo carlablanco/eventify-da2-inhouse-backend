@@ -1,9 +1,4 @@
-const bcrypt = require("bcrypt");
-const { LDAP_IP, LDAP_DC, LDAP_OU } = process.env;
-var LdapClient = require('ldapjs-client');
-var client = new LdapClient({ url: LDAP_IP });
-
-const LDAP_MODULES_ROUTE_OBJECT = `ou=modulos,${LDAP_OU},dc=${LDAP_DC}`;
+const { client, LDAP_MODULES_ROUTE_OBJECT } = require('../utils/ldapConnect');
 
 class ModuleService {
 
