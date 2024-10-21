@@ -1,5 +1,5 @@
 
-name: Build + Sonar (CI)
+name: CI
 on:
   push:
     branches: [main]

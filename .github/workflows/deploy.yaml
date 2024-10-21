@@ -2,7 +2,7 @@ name: Deploy to ECR and Terraform
 
 on:
   workflow_run:
-    workflows: ['Build + Sonar (CI)']
+    workflows: ['CI']
     types:
       - completed
 
