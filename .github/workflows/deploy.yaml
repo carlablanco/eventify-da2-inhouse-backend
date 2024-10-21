@@ -46,11 +46,20 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Docker image
+      - name: Build Docker image for Node.js
         run: |
-          docker build -t backend-repo -f infra/Dockerfile .
-          docker tag backend-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:latest
+          docker build -t backend-repo:node -f infra/node.Dockerfile .
+          docker tag backend-repo:node ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:node
 
-      - name: Push Docker image to ECR
+      - name: Push Docker image for Node.js to ECR
         run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:node
+
+      - name: Build Docker image for Python
+        run: |
+          docker build -t backend-repo:python -f infra/python.Dockerfile .
+          docker tag backend-repo:python ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:python
+
+      - name: Push Docker image for Python to ECR
+        run: |
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:python
