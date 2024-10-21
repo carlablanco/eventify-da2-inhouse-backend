@@ -3,6 +3,7 @@ from infer import inferir
 from flask import request
 
 app = Flask(__name__)
+app.config["WTF_CSRF_ENABLED"] = False
 
 @app.route("/inferir", methods=["POST"])
 def hello():
