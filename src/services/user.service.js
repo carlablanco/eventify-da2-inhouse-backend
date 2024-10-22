@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { client, LDAP_MODULES_ROUTE_OBJECT, LDAP_GLOBAL_ROUTE_OBJECT } = require('../utils/ldapConnect');
 
 class UserService {
-  async getModules() {
+  async getUsers() {
     try {
       const options = {
         scope: "sub",

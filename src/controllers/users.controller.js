@@ -13,7 +13,7 @@ class UserController {
 
   async getUsers(req, res) {
     try {
-      const users = await UserService.getModules();
+      const users = await UserService.getUsers();
       return res.status(200).json(users);
     } catch (err) {
       console.error(err);
