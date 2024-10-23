@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd /usr/src/app
-
 # Nodejs para el back
 npm start &
 
