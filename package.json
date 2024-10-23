@@ -4,7 +4,7 @@
   "description": "eventify_inhouse_be",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js",
     "test": "jest --coverage --runInBand --forceExit",
     "prettier": "prettier --write ."
   },
