@@ -1,5 +1,5 @@
 from flask import Flask
-from infer import inferir
+from machine_learning.infer import inferir
 from flask import request
 
 app = Flask(__name__)
