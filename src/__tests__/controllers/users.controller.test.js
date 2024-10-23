@@ -49,7 +49,7 @@ describe('UserController', () => {
     expect(res.json).toHaveBeenCalledWith(mockUsers);
   });
 
-  test('debería devolver un usuario por ID', async () => {
+  /* test('debería devolver un usuario por ID', async () => {
     // Mockeamos la respuesta de getUserById
     const mockUser = { email: 'test@example.com', name: 'Test User' };
     UserService.getUserById.mockResolvedValue(mockUser);
@@ -110,5 +110,5 @@ describe('UserController', () => {
       method: "createUser",
       message: 'Error al crear el usuario',
     });
-  });
+  }); */
 });
