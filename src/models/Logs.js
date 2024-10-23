@@ -64,6 +64,8 @@ logsSchema.statics.registerLog = async function (uid, username, modules, action,
             dia: String(new Date().getDate()),
         };
 
+        
+
         let response = await fetch(`${PYTHON_IP}/inferir`, {
             method: "POST",
             body: JSON.stringify(inferenceQuery),
