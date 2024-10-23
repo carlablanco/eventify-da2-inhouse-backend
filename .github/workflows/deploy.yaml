@@ -46,20 +46,15 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Download .env file from S3
+        run: |
+          aws s3 cp s3://bucket-eventify-inhouse-env/env .env
+
       - name: Build Docker image for Node.js
         run: |
-          docker build -t backend-repo:node -f infra/node.Dockerfile .
-          docker tag backend-repo:node ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:node
+          docker build -t backend-repo:latest -f infra/Dockerfile .
+          docker tag backend-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:latest
 
       - name: Push Docker image for Node.js to ECR
         run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:node
-
-      - name: Build Docker image for Python
-        run: |
-          docker build -t backend-repo:python -f infra/python.Dockerfile .
-          docker tag backend-repo:python ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:python
-
-      - name: Push Docker image for Python to ECR
-        run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:python
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:latest
