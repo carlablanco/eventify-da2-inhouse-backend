@@ -6,6 +6,9 @@ process.env.LDAP_DC = 'test_dc';
 const UserController = require('../../controllers/users.controller');
 const UserService = require('../../services/user.service');
 
+// Habilito o deshabilito los console.error para mostrarse en la consola durante el test.
+const SHOW_CONSOLE_ERRORS = false;
+
 jest.mock('../../services/user.service'); // Mock del UserService
 
 describe('UserController Singleton', () => {
@@ -41,10 +44,18 @@ describe('UserController', () => {
       status: jest.fn().mockReturnThis(), // Permite encadenar métodos
       json: jest.fn()
     };
+
+    if (!SHOW_CONSOLE_ERRORS)
+      // Silencia console.error
+      jest.spyOn(console, 'error').mockImplementation(() => { });
   });
 
   afterEach(() => {
     jest.clearAllMocks(); // Limpia los mocks después de cada test
+
+    if (!SHOW_CONSOLE_ERRORS)
+      // Restaura console.error
+      console.error.mockRestore();
   });
 
   test('debería devolver todos los usuarios', async () => {
