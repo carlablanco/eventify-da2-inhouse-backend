@@ -19,7 +19,7 @@ class UserController {
       console.error(err);
       return res.status(500).json({
         method: "getUsers",
-        message: err,
+        message: err.message,
       });
     }
   }
@@ -39,7 +39,7 @@ class UserController {
       console.error(err);
       return res.status(500).json({
         method: "getUserByMail",
-        message: err,
+        message: err.message,
       });
     }
   }
@@ -47,7 +47,7 @@ class UserController {
   async getUsersByModule(req, res) {
     try {
       const module = req.params.module;
-      const role = req.query.role;
+      const role = req.query?.role;
       let users = [];
       if (role)
         users = await UserService.getUsersByRole(role, module);
@@ -64,12 +64,12 @@ class UserController {
       console.error(err);
       return res.status(500).json({
         method: "getUsersByModule",
-        message: err,
+        message: err.message,
       });
     }
   }
 
-  async getUserById(req, res) {
+  /* async getUserById(req, res) {
     try {
       const id = req.params.id;
       let user = await UserService.getUserById(id);
@@ -87,7 +87,7 @@ class UserController {
         message: err,
       });
     }
-  }
+  } */
 
   async createUser(req, res) {
     try {
