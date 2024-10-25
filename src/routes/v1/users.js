@@ -7,6 +7,9 @@
  *     description: Get all users
  *     produces:
  *       - application/json
+ *     parameters:
+ *       - name: "page"
+ *         in: "query"
  *     responses:
  *       200:
  *         description: Return all users

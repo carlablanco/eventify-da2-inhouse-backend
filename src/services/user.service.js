@@ -2,8 +2,9 @@ const UserModel = require("../models/Users");
 const bcrypt = require("bcrypt");
 const { client, LDAP_MODULES_ROUTE_OBJECT, LDAP_GLOBAL_ROUTE_OBJECT } = require('../utils/ldapConnect');
 
+const PAGE_SIZE = 10;
 class UserService {
-  async getUsers() {
+  async getUsers(page) {
     try {
       const options = {
         scope: "sub",
@@ -11,6 +12,9 @@ class UserService {
       };
 
       let result = await client.search(LDAP_MODULES_ROUTE_OBJECT, options);
+
+      if (page === undefined)
+        page = 0;
 
       const users = [];
 
@@ -34,7 +38,35 @@ class UserService {
         }
       };
 
-      return users;
+      let pageData = {
+        totalPages: Math.ceil(users.length / PAGE_SIZE),
+        totalRegisters: users.length,
+        pageSize: PAGE_SIZE,
+        pageNumber: parseInt(page),
+      };
+
+      if (pageData.pageNumber > pageData.totalPages)
+        return ({
+          ...pageData,
+          users: []
+        })
+
+      let pagedUsers = users.slice(pageData.pageNumber * pageData.pageSize, (pageData.pageNumber * pageData.pageSize) + pageData.pageSize);
+
+      for (let i = 0; i < pagedUsers.length; i++) {
+        let userInfo = await this.getUserByEmail(pagedUsers[i].mail);
+
+        delete userInfo.objectClass;
+        delete userInfo.cn;
+        userInfo.isActive = true;
+
+        pagedUsers[i] = { ...pagedUsers[i], ...userInfo }
+      }
+
+      return ({
+        ...pageData,
+        pagedUsers
+      })
     }
     catch (err) {
       console.log(err);
