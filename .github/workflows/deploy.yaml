@@ -58,3 +58,7 @@ jobs:
       - name: Push Docker image for Node.js to ECR
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:latest
+
+      - name: Force new ECS deployment with new image
+        run: |
+          aws ecs update-service --cluster BackClusterInhouse --service BackClusterInhouseServicePOSTA --force-new-deployment
