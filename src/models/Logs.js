@@ -52,8 +52,8 @@ logsSchema.statics.registerLog = async function (uid, username, modules, action,
             roleId = roleTypes[Object.keys(modules)[0]].findIndex(r => modules[Object.keys(modules)[0]][0]);
         }
         else {
-            moduleId = Object.keys(roleTypes).findIndex(module);
-            roleId = roleTypes[module].findIndex(role);
+            moduleId = Object.keys(roleTypes).findIndex(m => module);
+            roleId = roleTypes[module].findIndex(r => role);
         }
 
         let inferenceQuery = {
@@ -64,7 +64,7 @@ logsSchema.statics.registerLog = async function (uid, username, modules, action,
             dia: String(new Date().getDate()),
         };
 
-        
+
 
         let response = await fetch(`${PYTHON_IP}/inferir`, {
             method: "POST",
