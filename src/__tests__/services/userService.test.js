@@ -176,7 +176,9 @@ describe("UserService", () => {
 
     const dn = 'cn=tomas01ariel@gmail.com,ou=usuarios,ou=eventify_sa,dc=eventify,dc=local';
 
-    await expect(UserService.createUser(dn)).toEqual({});
+    const result = await UserService.createUser(dn);
+
+    expect(result).toEqual(true);
   });
 });
 
