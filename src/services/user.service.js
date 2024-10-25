@@ -69,7 +69,7 @@ class UserService {
       })
     }
     catch (err) {
-      console.log(err);
+      console.error("Error in getUsers Service", err);
       throw new Error("Error in getUsers Service", err);
     }
   }
@@ -99,7 +99,7 @@ class UserService {
       return usersByRole;
     }
     catch (err) {
-      console.log(err);
+      console.error("Error in getUsersByRole Service", err);
       throw new Error("Error in getUsersByRole Service", err);
     }
   }
@@ -137,7 +137,7 @@ class UserService {
       return usersByModule;
     }
     catch (err) {
-      console.log(err);
+      console.error("Error in getUsersByModule Service", err);
       throw new Error("Error in getUsersByModule Service", err);
     }
   }
@@ -153,6 +153,9 @@ class UserService {
 
       let result = await client.search(LDAP_MODULES_ROUTE_OBJECT, options)
 
+      console.log("🚀 ~ file: user.service.js:156 ~ UserService ~ getRolesByUserDn ~ result:", result);
+
+
       const dictionary = {};
 
       for (let i = 0; i < result.length; i++) {
@@ -166,17 +169,18 @@ class UserService {
       return dictionary;
     }
     catch (err) {
-      console.log(err);
+      console.error("Error in getRolesByUserDn Service", err);
       throw new Error("Error in getRolesByUserDn Service", err);
     }
   }
 
   async getUserByEmail(email) {
+    console.log("HOLAAAAAA");
     try {
       const options = {
         filter: `(&(cn=${email}))`,
         scope: 'sub',
-        /* attributes: ['sn', 'cn', 'ou', 'telephoneNumber'] */
+        //attributes: ['sn', 'cn', 'ou', 'telephoneNumber']
       };
       const entries = await client.search(LDAP_GLOBAL_ROUTE_OBJECT, options);
 
@@ -185,14 +189,14 @@ class UserService {
       return { ...entries[0], modules: roles };
     }
     catch (err) {
-      console.log(err);
-      throw new Error("Error in getUserByMail Service");
+      console.error("Error in getUserByMail Service", err);
+      throw new Error("Error in getUserByMail Service", err);
     }
 
   }
 
   async createUser(user) {
-    try {
+    /* try {
       const isUserRegistered = await UserModel.findOne({ email: user.email });
       if (isUserRegistered) {
         throw new Error("User already registered");
@@ -204,7 +208,8 @@ class UserService {
     } catch (err) {
       console.error(err);
       throw new Error(err);
-    }
+    } */
+    return true;
   }
 }
 

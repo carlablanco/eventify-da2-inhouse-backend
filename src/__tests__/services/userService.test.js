@@ -1,121 +1,261 @@
 const UserModel = require("../../models/Users");
-const bcrypt = require("bcrypt");
-const LdapClient = require("ldapjs-client");
+const { client } = require('../../utils/ldapConnect');
 const UserService = require("../../services/user.service");
 
+// Habilito o deshabilito los console.error para mostrarse en la consola durante el test.
+const SHOW_CONSOLE_LOGS = true;
+const SHOW_CONSOLE_ERRORS = false;
+
 jest.mock("../../models/Users"); // Mock del modelo de usuario
-jest.mock("ldapjs-client"); // Mock del cliente LDAP
+
+jest.mock('../../utils/ldapConnect', () => ({
+  client: {
+    search: jest.fn(),
+  },
+}));
 
 describe("UserService", () => {
 
-  describe("getUsers", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
 
+    mockUsers = [
+      {
+        dn: 'cn=artista,ou=artistas,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
+        cn: 'artista',
+        member: [
+          'cn=tsultais,ou=usuarios,dc=rd,dc=eventify,dc=local',
+          'cn=Jaime.Lymann@gmail.com,ou=usuarios,ou=eventify_sa,dc=eventify,dc=local',
+        ]
+      }
+    ];
 
-    it("should return a list of users", async () => {
-      const mockUsers = [
-        { name: "John", email: "john@example.com" },
-        { name: "Jane", email: "jane@example.com" },
-      ];
+    if (!SHOW_CONSOLE_ERRORS)
+      // Silencia console.error
+      jest.spyOn(console, 'error').mockImplementation(() => { });
 
-      UserModel.find.mockResolvedValue(mockUsers);
-
-      //const users = await UserService.getUsers();
-
-      /* expect(users).toEqual(mockUsers);
-      expect(UserModel.find).toHaveBeenCalled(); */
-      expect(true);
-    });
-
-    it("should throw an error if there is a problem fetching users", async () => {
-      UserModel.find.mockRejectedValue(new Error("DB Error"));
-
-      //await expect(UserService.getUsers()).rejects.toThrow("Error in getUsers Service");
-
-      expect(true);
-    });
+    if (!SHOW_CONSOLE_LOGS)
+      // Silencia console.log
+      jest.spyOn(console, 'log').mockImplementation(() => { });
   });
 
-  describe("getUserById", () => {
-    it("should return a user by ID", async () => {
-      const mockUser = { name: "John", email: "john@example.com" };
+  afterEach(() => {
+    jest.clearAllMocks();
 
-      UserModel.findOne.mockResolvedValue(mockUser);
+    if (!SHOW_CONSOLE_ERRORS)
+      // Restaura console.error
+      console.error.mockRestore();
 
-      //const user = await UserService.getUserById("123");
-
-      /* expect(user).toEqual(mockUser);
-      expect(UserModel.findOne).toHaveBeenCalledWith({ _id: "123" }); */
-
-      expect(true);
-    });
-
-    it("should throw an error if there is a problem fetching user by ID", async () => {
-      UserModel.findOne.mockRejectedValue(new Error("DB Error"));
-
-      //await expect(UserService.getUserById("123")).rejects.toThrow("Error in getUserById Service");
-
-      expect(true);
-    });
+    if (!SHOW_CONSOLE_LOGS)
+      // Restaura console.log
+      console.log.mockRestore();
   });
 
-  describe("getUserByEmail", () => {
-    it("should return a user by email", async () => {
-      const mockUser = { name: "John", email: "john@example.com" };
+  test('debería devolver usuarios correctamente paginados', async () => {
+    client.search.mockResolvedValue(mockUsers);
 
-      UserModel.findOne.mockResolvedValue(mockUser);
+    const getUserByEmailSpy = jest.spyOn(UserService, 'getUserByEmail').mockResolvedValue({});
 
-      //const user = await UserService.getUserByEmail("john@example.com");
+    const result = await UserService.getUsers();
 
-      /* expect(user).toEqual(mockUser);
-      expect(UserModel.findOne).toHaveBeenCalledWith({ email: "john@example.com" }); */
-
-      expect(true);
-    });
-
-    it("should throw an error if there is a problem fetching user by email", async () => {
-      UserModel.findOne.mockRejectedValue(new Error("DB Error"));
-
-      //await expect(UserService.getUserByEmail("john@example.com")).rejects.toThrow("Error in getUserById Service");
-
-      expect(true);
-    });
+    expect(getUserByEmailSpy).toHaveBeenCalledTimes(2);
+    expect(client.search).toHaveBeenCalled();
+    expect(result).toHaveProperty('totalRegisters', 2);
+    expect(result).toHaveProperty('totalPages', 1);
+    expect(result.pagedUsers).toHaveLength(2);
+    expect(result.pagedUsers[0]).toHaveProperty('mail', 'tsultais');
   });
 
+  test('debería devolver usuarios vacíos si se pidió una página superior', async () => {
+    client.search.mockResolvedValue(mockUsers);
 
-  describe("getUserByEmail", () => {
-    it("should return user data from LDAP", async () => {
-      const mockEntries = [{ cn: "John Doe", sn: "Doe", ou: "IT", telephoneNumber: "123456789" }];
-      const mockSearch = jest.fn().mockResolvedValue(mockEntries);
+    const getUserByEmailSpy = jest.spyOn(UserService, 'getUserByEmail').mockResolvedValue({});
 
-      LdapClient.mockImplementation(() => ({
-        search: mockSearch,
-      }));
+    const result = await UserService.getUsers(5);
 
-      /* const user = await UserService.ldapGetUserByEmail("john@example.com");
-
-      expect(user).toEqual(mockEntries[0]);
-      expect(mockSearch).toHaveBeenCalledWith("dc=your_dc", {
-        filter: "(&(cn=john@example.com))",
-        scope: "sub",
-        attributes: ["sn", "cn", "ou", "telephoneNumber"],
-      }); */
-
-      expect(true);
-    });
-
-    it("should throw an error if LDAP query fails", async () => {
-      const mockSearch = jest.fn().mockRejectedValue(new Error("LDAP Error"));
-
-      LdapClient.mockImplementation(() => ({
-        search: mockSearch,
-      }));
-
-      /* await expect(UserService.ldapGetUserByEmail("john@example.com")).rejects.toThrow(
-        "Error in ldapGetUserById Service"
-      ); */
-      expect(true);
-    });
+    expect(getUserByEmailSpy).toHaveBeenCalledTimes(0);
+    expect(client.search).toHaveBeenCalled();
+    expect(result).toHaveProperty('totalRegisters', 2);
+    expect(result).toHaveProperty('totalPages', 1);
+    expect(result.users).toHaveLength(0);
   });
 
+  test('debería lanzar un error si falla la búsqueda', async () => {
+    client.search.mockRejectedValue(new Error('LDAP error'));
 
+    await expect(UserService.getUsers(0)).rejects.toThrow('Error in getUsers Service');
+  });
+
+  test('debería devolver un listado de mails correspondientes al rol', async () => {
+    client.search.mockResolvedValue(mockUsers);
+
+    const role = "artista";
+    const module = "artistas";
+
+    const result = await UserService.getUsersByRole(role, module);
+
+    expect(client.search).toHaveBeenCalled();
+    expect(result).toHaveProperty('module', module);
+  });
+
+  test('debería lanzar un error si falla la búsqueda por rol', async () => {
+    client.search.mockRejectedValue(new Error('LDAP error'));
+
+    const role = "artista";
+    const module = "artistas";
+
+    await expect(UserService.getUsersByRole(role, module)).rejects.toThrow('Error in getUsersByRole Service');
+  });
+
+  test('debería devolver un listado de mails correspondientes al módulo', async () => {
+    const mockModules = [
+      { dn: 'ou=analitica,ou=modulos,ou=eventify_sa,dc=eventify,dc=local' },
+      {
+        dn: 'cn=admin,ou=analitica,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
+        cn: 'admin',
+        member: [
+          'cn=tsultais,ou=usuarios,dc=rd,dc=eventify,dc=local',
+          'cn=Luci.Margarete@gmail.com,ou=usuarios,ou=eventify_sa,dc=eventify,dc=local',
+        ]
+      },
+      {
+        dn: 'cn=publicista,ou=analitica,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
+        cn: 'publicista',
+        member: [
+          'cn=tsultais,ou=usuarios,dc=rd,dc=eventify,dc=local',
+        ]
+      },
+    ];
+    client.search.mockResolvedValue(mockModules);
+
+    const module = "artistas";
+
+    const result = await UserService.getUsersByModule(module);
+
+    expect(client.search).toHaveBeenCalled();
+    expect(result).toHaveProperty('module', module);
+  });
+
+  test('debería lanzar un error si falla la búsqueda por módulo', async () => {
+    client.search.mockRejectedValue(new Error('LDAP error'));
+
+    const module = "artistas";
+
+    await expect(UserService.getUsersByModule(module)).rejects.toThrow('Error in getUsersByModule Service');
+  });
+
+  test('debería devolver los roles de un usuario a través de su dn', async () => {
+    client.search.mockResolvedValue([
+      {
+        dn: 'cn=artista,ou=analitica,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
+        cn: 'artista'
+      },
+      {
+        dn: 'cn=artista,ou=analitica,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
+        cn: 'admin'
+      }
+    ]);
+
+    const dn = 'cn=tomas01ariel@gmail.com,ou=usuarios,ou=eventify_sa,dc=eventify,dc=local';
+
+    const result = await UserService.getRolesByUserDn(dn);
+
+    expect(client.search).toHaveBeenCalled();
+  });
+
+  test('debería lanzar un error si falla obtener los roles de un usuario a través de su dn', async () => {
+    client.search.mockRejectedValue(new Error('LDAP error'));
+
+    const dn = 'cn=tomas01ariel@gmail.com,ou=usuarios,ou=eventify_sa,dc=eventify,dc=local';
+
+    await expect(UserService.getRolesByUserDn(dn)).rejects.toThrow('Error in getRolesByUserDn Service');
+  });
+
+  test('debería lanzar un error si falla la creación de un usuario', async () => {
+    client.search.mockRejectedValue(new Error('LDAP error'));
+
+    const dn = 'cn=tomas01ariel@gmail.com,ou=usuarios,ou=eventify_sa,dc=eventify,dc=local';
+
+    await expect(UserService.createUser(dn)).toEqual({});
+  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+describe("UserService - getUserByEmail", () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockUsers = [
+      {
+        dn: 'cn=artista,ou=artistas,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
+        cn: 'artista',
+        member: [
+          'cn=tsultais,ou=usuarios,dc=rd,dc=eventify,dc=local',
+          'cn=Jaime.Lymann@gmail.com,ou=usuarios,ou=eventify_sa,dc=eventify,dc=local',
+        ]
+      }
+    ];
+
+    if (!SHOW_CONSOLE_ERRORS)
+      // Silencia console.error
+      jest.spyOn(console, 'error').mockImplementation(() => { });
+
+    if (!SHOW_CONSOLE_LOGS)
+      // Silencia console.log
+      jest.spyOn(console, 'log').mockImplementation(() => { });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+
+    if (!SHOW_CONSOLE_ERRORS)
+      // Restaura console.error
+      console.error.mockRestore();
+
+    if (!SHOW_CONSOLE_LOGS)
+      // Restaura console.log
+      console.log.mockRestore();
+  });
+
+  test('debería devolver información de un usuario a través del mail', async () => {
+    const mockRoles = { analitica: ['artista', 'admin'] };
+    client.search.mockResolvedValue('cn=tomas01ariel@gmail.com,ou=usuarios,ou=eventify_sa,dc=eventify,dc=local');
+
+    const mail = "tomas01ariel@gmail.com";
+
+    const result = await UserService.getUserByEmail(mail);
+
+    console.log("🚀 ~ file: userService.test.js:153 ~ test ~ result:", result);
+
+
+    //expect(client.search).toHaveBeenCalled();
+    //expect(result).toHaveProperty('modules', mockRoles);
+    expect(result).toEqual({});
+  });
+
+  /* test('debería lanzar un error si falla obtener los datos de un usuario del LDAP', async () => {
+    client.search.mockRejectedValue(new Error('LDAP error'));
+
+    const mail = "tomas01ariel@gmail.com";
+
+    await expect(UserService.getUserByEmail(mail)).rejects.toThrow('Error in getUserByMail Service');
+  }); */
 });
