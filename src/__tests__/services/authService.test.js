@@ -1,117 +1,66 @@
 const bcrypt = require("bcrypt");
 const UserModel = require("../../models/Users");
 const AuthService = require("../../services/auth.service");
-const LdapClient = require("ldapjs-client");
+const { client } = require('../../utils/ldapConnect');
+
+// Habilito o deshabilito los console.error para mostrarse en la consola durante el test.
+const SHOW_CONSOLE_LOGS = false;
+const SHOW_CONSOLE_ERRORS = false;
 
 jest.mock("../../models/Users"); // Mock del modelo de usuario
-jest.mock("ldapjs-client"); // Mock del cliente LDAP
+
+jest.mock('../../utils/ldapConnect', () => ({
+  client: {
+    bind: jest.fn(),
+  },
+}));
 
 describe("AuthService", () => {
 
-  describe("hasValidCredentials", () => {
+  beforeEach(() => {
+    email = 'test@example.com';
+    password = '1234';
 
+    if (!SHOW_CONSOLE_ERRORS)
+      // Silencia console.error
+      jest.spyOn(console, 'error').mockImplementation(() => { });
 
-    it("should return true if email and password match", async () => {
-      const mockUser = {
-        email: "john@example.com",
-        password: bcrypt.hashSync("123456", 10),
-      };
+    if (!SHOW_CONSOLE_LOGS)
+      // Silencia console.log
+      jest.spyOn(console, 'log').mockImplementation(() => { });
+  });
 
-      // Simula que el modelo retorna un usuario
-      UserModel.findOne.mockResolvedValue(mockUser);
+  afterEach(() => {
+    jest.clearAllMocks();
 
-      /* const isValid = await AuthService.hasValidCredentials(
-        "john@example.com",
-        "123456"
-      ); */
+    if (!SHOW_CONSOLE_ERRORS)
+      // Restaura console.error
+      console.error.mockRestore();
 
-      /* expect(isValid).toBe(true);
-      expect(UserModel.findOne).toHaveBeenCalledWith({ email: "john@example.com" }); */
+    if (!SHOW_CONSOLE_LOGS)
+      // Restaura console.log
+      console.log.mockRestore();
+  });
 
-      expect(true).toBe(true);
-    });
+  describe("ldapValidCredentials", () => {
+    it("should return a successful login for valid LDAP credentials", async () => {
+      const bindResult = { status: 0 };
+      client.bind.mockResolvedValue(bindResult);
 
-    /*
+      const result = await AuthService.ldapValidCredentials(email, password);
 
-    it("should return false if email does not exist", async () => {
-      // Simula que no se encuentra el usuario
-      UserModel.findOne.mockResolvedValue(null);
-
-      const isValid = await AuthService.hasValidCredentials(
-        "john@example.com",
-        "123456"
-      );
-
-      expect(isValid).toBe(null);
-      expect(UserModel.findOne).toHaveBeenCalledWith({ email: "john@example.com" });
-    });
-
-    */
-
-    it("should return false if password does not match", async () => {
-      const mockUser = {
-        email: "john@example.com",
-        password: bcrypt.hashSync("abcdef", 10),
-      };
-
-      UserModel.findOne.mockResolvedValue(mockUser);
-
-      /* const isValid = await AuthService.hasValidCredentials(
-        "john@example.com",
-        "123456"
-      ); */
-
-      //expect(isValid).toBe(false);
-      expect(true).toBe(true);
+      expect(result).toHaveProperty('status', 0);
     });
 
 
+    it("debería devolver error en la conexión con el LDAP", async () => {
+      client.bind.mockRejectedValue(new Error('LDAP error'));
 
-    it("should throw an error if there is a problem during validation", async () => {
-      // Simula un error en la búsqueda de usuario
-      UserModel.findOne.mockRejectedValue(new Error("DB error"));
-
-      /* await expect(
-        AuthService.hasValidCredentials("john@example.com", "123456")
-      ).rejects.toThrow("Error in credentials validation"); */
-      await expect(true).toBe(true);
+      await expect(AuthService.ldapValidCredentials(email, password)).rejects.toThrow("Error with LDAP credentials validation");
     });
-
 
   });
 
-  /*
-    describe("ldapValidCredentials", () => {
-  
-    
-      it("should return a successful login for valid LDAP credentials", async () => {
-        const mockBind = jest.fn().mockResolvedValue(true); // Simula que el bind en LDAP es exitoso
-        LdapClient.mockImplementation(() => ({
-          bind: mockBind,
-        }));
-  
-        const isValid = await AuthService.ldapValidCredentials("john@example.com", "password123");
-  
-        expect(isValid).toBe(true);
-        expect(mockBind).toHaveBeenCalledWith("cn=john@example.com,ou=your_ou,dc=your_dc", "password123");
-      });
-  
-          
-      it("should throw an error if LDAP credentials are invalid", async () => {
-        const mockBind = jest.fn().mockRejectedValue(new Error("LDAP error"));
-        LdapClient.mockImplementation(() => ({
-          bind: mockBind,
-        }));
-  
-        await expect(
-          AuthService.ldapValidCredentials("invalid@example.com", "wrongpassword")
-        ).rejects.toThrow("Error with LDAP credentials validation");
-  
-        expect(mockBind).toHaveBeenCalledWith("cn=invalid@example.com,ou=your_ou,dc=your_dc", "wrongpassword");
-      });
-  
-    });
-  
-    */
+
 
 });

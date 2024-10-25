@@ -3,23 +3,19 @@ process.env.LDAP_IP = 'ldap://test_ldap_ip';
 process.env.LDAP_OU = 'test_ou';
 process.env.LDAP_DC = 'test_dc';
 
-// ldapjs-client
-jest.mock('ldapjs-client', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      bind: jest.fn().mockResolvedValue(true),
-      search: jest.fn().mockResolvedValue([{ cn: 'Test User', email: 'test@example.com' }]),
-    };
-  });
-});
-
 const LoginController = require('../../controllers/login.controller');
 const AuthService = require('../../services/auth.service');
 const UserService = require('../../services/user.service');
+const LogsModel = require('../../models/Logs');
 const jwt = require('jsonwebtoken');
+
+// Habilito o deshabilito los console.error para mostrarse en la consola durante el test.
+const SHOW_CONSOLE_LOGS = false;
+const SHOW_CONSOLE_ERRORS = false;
 
 jest.mock('../../services/auth.service');
 jest.mock('../../services/user.service');
+jest.mock('../../models/Logs');
 
 describe('LoginController', () => {
   let req, res;
@@ -28,7 +24,7 @@ describe('LoginController', () => {
     req = {
       body: {
         email: 'test@example.com',
-        password: 'password123'
+        password: '1234'
       }
     };
 
@@ -36,30 +32,50 @@ describe('LoginController', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn()
     };
+
+    if (!SHOW_CONSOLE_ERRORS)
+      // Silencia console.error
+      jest.spyOn(console, 'error').mockImplementation(() => { });
+
+    if (!SHOW_CONSOLE_LOGS)
+      // Silencia console.log
+      jest.spyOn(console, 'log').mockImplementation(() => { });
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+
+    if (!SHOW_CONSOLE_ERRORS)
+      // Restaura console.error
+      console.error.mockRestore();
+
+    if (!SHOW_CONSOLE_LOGS)
+      // Restaura console.log
+      console.log.mockRestore();
   });
 
-  /* test('debería devolver un token y la información del usuario en caso de login exitoso', async () => {
+  test('debería devolver un token y la información del usuario en caso de login exitoso', async () => {
     // Mockeamos la respuesta de ldapValidCredentials
     AuthService.ldapValidCredentials.mockResolvedValue({ status: 0 });
 
     // Mockeamos la respuesta de getUserByEmail
-    const mockUser = { cn: 'Test User', email: 'test@example.com' };
+    const mockUser = { cn: 'test@example.com' };
     UserService.getUserByEmail.mockResolvedValue(mockUser);
 
     // Mockeamos el método jwt.sign
     jest.spyOn(jwt, 'sign').mockReturnValue('mocked_token');
 
+    // Mockeamos la respuesta de registerLog
+    LogsModel.registerLog.mockResolvedValue(null);
+
     // Llamamos al método login
     await LoginController.login(req, res);
 
     // Expectativas
-    expect(AuthService.ldapValidCredentials).toHaveBeenCalledWith('test@example.com', 'password123');
+    expect(AuthService.ldapValidCredentials).toHaveBeenCalledWith('test@example.com', '1234');
     expect(UserService.getUserByEmail).toHaveBeenCalledWith('test@example.com');
     expect(jwt.sign).toHaveBeenCalledWith(mockUser, process.env.SECRET_KEY_JWT, { expiresIn: '1d' });
+    expect(LogsModel.registerLog).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       status: 200,
@@ -94,9 +110,5 @@ describe('LoginController', () => {
       method: 'login',
       message: 'Internal Server Error',
     });
-  }); */
-
-  test('dummy test', async () => {
-    expect(true);
-  })
+  });
 });
