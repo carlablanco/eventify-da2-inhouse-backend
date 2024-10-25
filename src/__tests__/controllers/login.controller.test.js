@@ -1,3 +1,8 @@
+process.env.SECRET_KEY_JWT = 'test_secret_key';
+process.env.LDAP_IP = 'ldap://test_ldap_ip';
+process.env.LDAP_OU = 'test_ou';
+process.env.LDAP_DC = 'test_dc';
+
 const LoginController = require('../../controllers/login.controller');
 const AuthService = require('../../services/auth.service');
 const UserService = require('../../services/user.service');

@@ -245,11 +245,6 @@ describe("UserService - getUserByEmail", () => {
 
     const result = await UserService.getUserByEmail(mail);
 
-    console.log("🚀 ~ file: userService.test.js:153 ~ test ~ result:", result);
-
-
-    //expect(client.search).toHaveBeenCalled();
-    //expect(result).toHaveProperty('modules', mockRoles);
     expect(result).toEqual({});
   });
 

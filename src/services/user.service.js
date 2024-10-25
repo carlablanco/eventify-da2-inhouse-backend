@@ -153,9 +153,6 @@ class UserService {
 
       let result = await client.search(LDAP_MODULES_ROUTE_OBJECT, options)
 
-      console.log("🚀 ~ file: user.service.js:156 ~ UserService ~ getRolesByUserDn ~ result:", result);
-
-
       const dictionary = {};
 
       for (let i = 0; i < result.length; i++) {
@@ -175,7 +172,6 @@ class UserService {
   }
 
   async getUserByEmail(email) {
-    console.log("HOLAAAAAA");
     try {
       const options = {
         filter: `(&(cn=${email}))`,
