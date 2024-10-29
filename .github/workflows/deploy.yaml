@@ -61,4 +61,4 @@ jobs:
 
       - name: Force new ECS deployment with new image
         run: |
-          aws ecs update-service --cluster BackClusterInhouse --service BackClusterInhouseServicePOSTA --force-new-deployment
+          aws ecs update-service --cluster BackClusterInhouse --service BackClusterInhouseService --force-new-deployment
