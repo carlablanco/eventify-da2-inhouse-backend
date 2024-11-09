@@ -34,6 +34,13 @@ class LoginController {
 
         LogsModel.registerLog(user.uid, user.cn, user.modules, logTypes.LOGIN);
 
+        // Establece la cookie con el token
+        res.cookie('auth_token', token, {
+          httpOnly: true,     // Hace que la cookie no sea accesible desde JavaScript
+          secure: true,       // En producción, asegúrate de usar `true` para HTTPS
+          maxAge: 3600000     // Expira en 1 hora
+        });
+
         return res.status(200).json({
           status: 200,
           user,
@@ -41,6 +48,7 @@ class LoginController {
           message: "Token created successfully.",
         });
       }
+
       else {
         return res.status(401).json({
           message: "Unauthorized.",

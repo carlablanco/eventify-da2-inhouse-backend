@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const cors = require("cors");
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
@@ -41,6 +42,9 @@ app.use(morgan("dev"));
 // Defino el tratamiento del body
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// Instancio cookie parser
+app.use(cookieParser());
 
 // Configuro cors
 const port = process.env.PORT || 3000;
