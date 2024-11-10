@@ -13,7 +13,7 @@ const validateJwt = async (req, res = response, next) => {
 
     const validacionJwt = jwt.verify(refToken,SECRET_KEY_JWT);
 
-    if (!validateJwt) {
+    if (!validacionJwt) {
       res.status(401).json({
         message: "Token invalido"
       })
@@ -23,8 +23,12 @@ const validateJwt = async (req, res = response, next) => {
 
     req.usuarioSesion = jwt.decode(refToken, SECRET_KEY_JWT);
 
-    next();
+    res.json(200, {
+        sesionData: req.usuarioSesion
+    })
 
+    
+    return;
     
 
   } else {
@@ -32,6 +36,8 @@ const validateJwt = async (req, res = response, next) => {
     res.status(401).json({
       message: "No hay token provisto"
     })
+
+    return;
 
   }
   

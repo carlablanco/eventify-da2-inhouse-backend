@@ -27,8 +27,8 @@ const { check } = require("express-validator");
 const RoleController = require("../../controllers/roles.controller");
 const checkFields = require("../../middlewares/field-validation.middleware");
 const router = Router();
-const validateJwt = require('../../middlewares/auth.middleware');
+const validateJwtMdw = require('../../middlewares/auth.middleware');
 
-router.get("/:module", RoleController.getRolesByModule);
+router.get("/:module",validateJwtMdw, RoleController.getRolesByModule);
 
 module.exports = router;

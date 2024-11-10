@@ -12,7 +12,10 @@ const roles = require("./src/routes/v1/roles");
 const logs = require("./src/routes/v1/logs");
 const login = require("./src/routes/v1/login");
 const healthCheck = require("./src/routes/v1/healthCheck");
+const serverHttp = require("https")
 const morgan = require("morgan");
+const fs = require("fs")
+const cookieParser = require('cookie-parser');
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -44,7 +47,18 @@ app.use(bodyParser.json());
 
 // Configuro cors
 const port = process.env.PORT || 3000;
-app.use(cors());
+
+app.use(cookieParser())
+
+app.use(cors({
+  origin: ["https://moduloexterno.eventify.dev:3005",
+          "https://frontend.eventify.dev:3000",
+            "https://frontend.deliver.ar:3000",
+            "https://moduloexterno.deliver.ar:3008"
+          
+  ],
+  credentials: true
+}));
 
 // Defino rutas
 app.use("/api/v1/login", login);
@@ -60,9 +74,17 @@ app.use(
 );
 
 // Inicio servidor
+/*
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });
+*/
+const options = {
+  key: fs.readFileSync('./key.backend.deliver.ar.pem'),
+  cert: fs.readFileSync('./backend.deliver.ar.pem'),
+};
+
+serverHttp.createServer(options,app).listen(3001);
 
 // Conecto a la base de datos
 connectDB();

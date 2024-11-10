@@ -57,11 +57,12 @@ const express = require("express");
 const router = express.Router();
 const LoginController = require("../../controllers/login.controller");
 const { check } = require("express-validator");
-const validateJwt = require("../../middlewares/auth.middleware");
+const validateJwtMdw = require("../../middlewares/auth.middleware");
+const validateJwtAuth = require("../../middlewares/auth.validate")
 const checkFields = require("../../middlewares/field-validation.middleware");
 
 //Valida JWT del sessionStorage
-router.post("/token", validateJwt);
+router.post("/token", validateJwtAuth);
 
 //Loguea un usuario
 router.post(
