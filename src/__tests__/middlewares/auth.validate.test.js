@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const validateJwt = require('../../middlewares/auth.middleware');
+const validateJwt = require('../../middlewares/auth.validate');
 
 // Habilito o deshabilito los console.error para mostrarse en la consola durante el test.
 const SHOW_CONSOLE_LOGS = false;
@@ -17,7 +17,7 @@ jest.mock('jsonwebtoken', () => ({
 }));
 
 
-describe('AuthMiddleware', () => {
+describe('AuthValidateMiddleware', () => {
   let req, res;
 
   beforeEach(() => {
@@ -54,10 +54,7 @@ describe('AuthMiddleware', () => {
       console.log.mockRestore();
   });
 
-  test('validateJwt debería llamar al callback', async () => {
-    // Crea una función mock para el callback
-    const mockCallback = jest.fn();
-
+  test('validateJwt debería retornar', async () => {
     // Mockeamos el método jwt.verify
     jest.spyOn(jwt, 'verify').mockReturnValue(true);
 
@@ -65,11 +62,11 @@ describe('AuthMiddleware', () => {
     jest.spyOn(jwt, 'decode').mockReturnValue('mocked_token');
 
     // Llamamos al método validateJwt
-    await validateJwt(req, res, mockCallback);
+    await validateJwt(req, res);
 
     // Expectativas
     // Verifica si el callback fue llamado
-    expect(mockCallback).toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalled();
   });
 
 

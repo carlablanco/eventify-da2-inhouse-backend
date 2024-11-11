@@ -5,15 +5,15 @@ const { SECRET_KEY_JWT, NODE_ENV } = process.env;
 
 const validateJwt = async (req, res = response, next) => {
 
-  
+
 
   if (req.cookies && req.cookies.token) {
 
     const refToken = req.cookies.token;
 
-    const validacionJwt = jwt.verify(refToken,SECRET_KEY_JWT);
+    const validacionJwt = jwt.verify(refToken, SECRET_KEY_JWT);
 
-    if (!validateJwt) {
+    if (!validacionJwt) {
       res.status(401).json({
         message: "Token invalido"
       })
@@ -25,7 +25,7 @@ const validateJwt = async (req, res = response, next) => {
 
     next();
 
-    
+
 
   } else {
 
@@ -34,7 +34,7 @@ const validateJwt = async (req, res = response, next) => {
     })
 
   }
-  
+
 };
 
 module.exports = validateJwt;

@@ -19,7 +19,7 @@ class LogsController {
       console.error(err);
       return res.status(500).json({
         method: "getLogs",
-        message: err,
+        message: err.message,
       });
     }
   }
@@ -32,8 +32,8 @@ class LogsController {
     } catch (err) {
       console.error(err);
       return res.status(500).json({
-        method: "getLogs",
-        message: err,
+        method: "getLogsByMail",
+        message: err.message,
       });
     }
   }

@@ -20,8 +20,6 @@ class LoginController {
     try {
       const { email, password, redirectUrl } = req.body;
 
-      
-
       let isUserRegistered = await AuthService.ldapValidCredentials(email, password);
       console.log("LDAP-LOGIN = ", isUserRegistered);
 
@@ -39,7 +37,7 @@ class LoginController {
         res.cookie('token', token, {
           httpOnly: true,     // Hace que la cookie no sea accesible desde JavaScript
           secure: true,       // En producción, asegúrate de usar `true` para HTTPS
-          domain: ".deliver.ar",       
+          domain: ".deliver.ar",
           maxAge: 3600000,
           sameSite: "none"     // Expira en 1 hora
         });
@@ -60,6 +58,29 @@ class LoginController {
       console.error(err);
       return res.status(500).json({
         method: "login",
+        message: err.message,
+      });
+    }
+  }
+
+  async logout(req, res) {
+    try {
+      res.cookie('token', '', {
+        httpOnly: true,
+        secure: true,
+        domain: ".deliver.ar",
+        expires: new Date(0),   // Expira inmediatamente
+        sameSite: "none"
+      });
+
+      return res.status(200).json({
+        status: 200,
+        message: "Logout successfully.",
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        method: "logout",
         message: err.message,
       });
     }

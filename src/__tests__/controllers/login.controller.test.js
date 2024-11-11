@@ -29,6 +29,7 @@ describe('LoginController', () => {
     };
 
     res = {
+      cookie: jest.fn(),
       status: jest.fn().mockReturnThis(),
       json: jest.fn()
     };
@@ -108,6 +109,34 @@ describe('LoginController', () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       method: 'login',
+      message: 'Internal Server Error',
+    });
+  });
+
+  test('debería devolver logout exitoso', async () => {
+    // Llamamos al método logout
+    await LoginController.logout(req, res);
+
+    // Expectativas
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      status: 200,
+      message: 'Logout successfully.',
+    });
+  });
+
+  test('debería devolver 500 para error del servidor', async () => {
+    res.cookie.mockImplementationOnce(() => {
+      throw new Error('Internal Server Error');
+    });
+
+    // Llamamos al método logout
+    await LoginController.logout(req, res);
+
+    // Expectativas
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      method: 'logout',
       message: 'Internal Server Error',
     });
   });

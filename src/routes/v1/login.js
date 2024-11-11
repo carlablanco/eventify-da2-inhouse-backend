@@ -51,6 +51,20 @@
  *         description: Not Found
  *       500:
  *         description: Error
+ * /api/v1/login/logout:
+ *  post:
+ *     tags:
+ *       - Login
+ *     description: Logout
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Successfully logout
+ *       404:
+ *         description: Token Not Found
+ *       500:
+ *         description: Error
  */
 
 const express = require("express");
@@ -74,5 +88,8 @@ router.post(
   ],
   LoginController.login,
 );
+
+//Logout
+router.post("/logout", validateJwtMdw, LoginController.logout);
 
 module.exports = router;

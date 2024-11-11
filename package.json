@@ -36,7 +36,14 @@
     "supertest": "^7.0.0"
   },
   "jest": {
-    "testResultsProcessor": "jest-sonar-reporter"
+    "testResultsProcessor": "jest-sonar-reporter",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/index.js"
+    ],
+    "coverageDirectory": "coverage",
+    "testEnvironment": "node"
   },
   "jestSonar": {
     "sonar56x": true,
