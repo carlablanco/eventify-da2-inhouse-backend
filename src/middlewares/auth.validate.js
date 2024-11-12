@@ -5,13 +5,13 @@ const { SECRET_KEY_JWT, NODE_ENV } = process.env;
 
 const validateJwt = async (req, res = response, next) => {
 
-
+  
 
   if (req.cookies && req.cookies.token) {
 
     const refToken = req.cookies.token;
 
-    const validacionJwt = jwt.verify(refToken, SECRET_KEY_JWT);
+    const validacionJwt = jwt.verify(refToken,SECRET_KEY_JWT);
 
     if (!validacionJwt) {
       res.status(401).json({
@@ -23,9 +23,13 @@ const validateJwt = async (req, res = response, next) => {
 
     req.usuarioSesion = jwt.decode(refToken, SECRET_KEY_JWT);
 
-    next();
+    res.json(200, {
+        sesionData: req.usuarioSesion
+    })
 
-
+    
+    return;
+    
 
   } else {
 
@@ -33,8 +37,10 @@ const validateJwt = async (req, res = response, next) => {
       message: "No hay token provisto"
     })
 
-  }
+    return;
 
+  }
+  
 };
 
 module.exports = validateJwt;

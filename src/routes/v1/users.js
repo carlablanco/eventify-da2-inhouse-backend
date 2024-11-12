@@ -110,7 +110,8 @@ const { check } = require("express-validator");
 const UserController = require("../../controllers/users.controller");
 const checkFields = require("../../middlewares/field-validation.middleware");
 const router = Router();
-const validateJwt = require('../../middlewares/auth.middleware');
+const validateJwtMdw = require('../../middlewares/auth.middleware');
+
 
 //Crea un usuario
 router.post(
@@ -125,12 +126,12 @@ router.post(
 ); //POST USUARIOS
 
 //Devuelve todos los usuarios
-router.get("/", UserController.getUsers); //GET USUARIOS
+router.get("/", validateJwtMdw, UserController.getUsers); //GET USUARIOS
 
 //Devuelve un usuario por mail
-router.get("/:mail", UserController.getUserByMail); //GET USUARIO BY MAIL
+router.get("/:mail", validateJwtMdw, UserController.getUserByMail); //GET USUARIO BY MAIL
 
 //Devuelve un usuario por mail
-router.get("/modules/:module", UserController.getUsersByModule); //GET USUARIO BY MAIL
+router.get("/modules/:module", validateJwtMdw , UserController.getUsersByModule); //GET USUARIO BY MAIL
 
 module.exports = router;

@@ -48,11 +48,11 @@ const { check } = require("express-validator");
 const LogsController = require("../../controllers/logs.controller");
 const checkFields = require("../../middlewares/field-validation.middleware");
 const router = Router();
-const validateJwt = require('../../middlewares/auth.middleware');
+const validateJwtMdw = require('../../middlewares/auth.middleware');
 
 //Devuelve todos los logs
-router.get("/", LogsController.getLogs); //GET LOGS
+router.get("/", validateJwtMdw, LogsController.getLogs); //GET LOGS
 
-router.get("/:mail", LogsController.getLogsByMail); //GET LOGS BY MAIL
+router.get("/:mail", validateJwtMdw, LogsController.getLogsByMail); //GET LOGS BY MAIL
 
 module.exports = router;

@@ -20,7 +20,7 @@ class RoleController {
       console.error(err);
       return res.status(500).json({
         method: "getRolesByModule",
-        message: err,
+        message: err.message,
       });
     }
   }

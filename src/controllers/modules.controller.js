@@ -8,6 +8,7 @@ class ModuleController {
     if (!instance) {
       return new ModuleController();
     }
+    console.log("HOALAAAAAAAAAAAAAA");
     return instance;
   }
 
@@ -19,7 +20,7 @@ class ModuleController {
       console.error(err);
       return res.status(500).json({
         method: "getModules",
-        message: err,
+        message: err.message,
       });
     }
   }

@@ -51,17 +51,32 @@
  *         description: Not Found
  *       500:
  *         description: Error
+ * /api/v1/login/logout:
+ *  post:
+ *     tags:
+ *       - Login
+ *     description: Logout
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Successfully logout
+ *       404:
+ *         description: Token Not Found
+ *       500:
+ *         description: Error
  */
 
 const express = require("express");
 const router = express.Router();
 const LoginController = require("../../controllers/login.controller");
 const { check } = require("express-validator");
-const validateJwt = require("../../middlewares/auth.middleware");
+const validateJwtMdw = require("../../middlewares/auth.middleware");
+const validateJwtAuth = require("../../middlewares/auth.validate")
 const checkFields = require("../../middlewares/field-validation.middleware");
 
 //Valida JWT del sessionStorage
-router.post("/token", validateJwt);
+router.post("/token", validateJwtAuth);
 
 //Loguea un usuario
 router.post(
@@ -73,5 +88,8 @@ router.post(
   ],
   LoginController.login,
 );
+
+//Logout
+router.post("/logout", validateJwtMdw, LoginController.logout);
 
 module.exports = router;
