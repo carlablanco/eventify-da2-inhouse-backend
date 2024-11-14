@@ -46,7 +46,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Configuro cors
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 app.use(cookieParser())
 
@@ -54,7 +54,8 @@ app.use(cors({
   origin: ["https://moduloexterno.eventify.dev:3005",
           "https://frontend.eventify.dev:3000",
             "https://frontend.deliver.ar:3000",
-            "https://moduloexterno.deliver.ar:3008"
+            "https://moduloexterno.deliver.ar:3008",
+	"https://intranet.deliver.ar/
           
   ],
   credentials: true
@@ -74,17 +75,19 @@ app.use(
 );
 
 // Inicio servidor
-/*
+
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });
-*/
-const options = {
+
+/*const options = {
   key: fs.readFileSync('./key.backend.deliver.ar.pem'),
   cert: fs.readFileSync('./backend.deliver.ar.pem'),
 };
 
+
 serverHttp.createServer(options,app).listen(3001);
+*/
 
 // Conecto a la base de datos
 connectDB();
