@@ -30,7 +30,7 @@ describe('POST /api/v1/users', () => {
 
   test('obtiene todos los usuarios', async () => {
     // Mockeamos la respuesta del controlador
-    UserController.getUsers.mockImplementation(async (req, res) => {
+    UsersController.getUsers.mockImplementation(async (req, res) => {
       return res.status(200).json([]);
     });
 
