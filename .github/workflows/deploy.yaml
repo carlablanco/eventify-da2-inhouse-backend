@@ -1,4 +1,4 @@
-name: Deploy to ECR and Terraform
+name: Deploy to EC2
 
 on:
   workflow_run:
@@ -15,50 +15,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Set up AWS Credentials
-        run: |
-          mkdir -p ~/.aws
-          echo "[default]" > ~/.aws/credentials
-          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
-          echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
-          echo "aws_session_token = ${{ secrets.AWS_SESSION_TOKEN }}" >> ~/.aws/credentials
-
-          echo "[default]" > ~/.aws/config
-          echo "region = us-east-1" >> ~/.aws/config
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
+      - uses: actions/setup-node@v4
         with:
-          terraform_version: 1.5.0
-
-      - name: Terraform Init
-        working-directory: infra
-        run: terraform init
-
-      - name: Terraform Apply (Create or Update Resources)
-        working-directory: infra
-        run: terraform apply -auto-approve
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Log in to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Download .env file from S3
-        run: |
-          aws s3 cp s3://bucket-eventify-inhouse-env/env .env
-
-      - name: Build Docker image for Node.js
-        run: |
-          docker build -t backend-repo:latest -f infra/Dockerfile .
-          docker tag backend-repo:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:latest
-
-      - name: Push Docker image for Node.js to ECR
-        run: |
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/backend-repo:latest
-
-      - name: Force new ECS deployment with new image
-        run: |
-          aws ecs update-service --cluster BackClusterInhouse --service BackClusterInhouseServicePOSTA --force-new-deployment
+          node-version: "^18"
+      - name: Install dependencies
+        run: npm install
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avzr --delete --exclude '.env'
+          path: ./*
+          remote_path: /backend/
+          remote_host: ldap.deliver.ar
+          remote_user: ubuntu
+          remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
