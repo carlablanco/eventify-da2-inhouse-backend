@@ -1,5 +1,40 @@
 class CheckService {
 
+    /* [
+        {
+            module: "analitica",
+            isHealthy: true,
+            previousStatus: [
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+            ]
+        },
+        {
+            module: "eda",
+            isHealthy: false,
+            previousStatus: [
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+            ]
+        }
+    ] */
+
     async getHealthyStatus(module) {
         try {
             const options = {
