@@ -1,5 +1,5 @@
 const { client } = require('../../utils/ldapConnect');
-const ModuleService = require("../../services/module.service");
+const RoleService = require("../../services/role.service");
 
 // Habilito o deshabilito los console.error para mostrarse en la consola durante el test.
 const SHOW_CONSOLE_LOGS = true;
@@ -11,7 +11,7 @@ jest.mock('../../utils/ldapConnect', () => ({
   },
 }));
 
-describe("ModuleService", () => {
+describe("RoleService", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -37,8 +37,8 @@ describe("ModuleService", () => {
       console.log.mockRestore();
   });
 
-  test('debería devolver todos los módulos', async () => {
-    mockModules = [
+  test('debería devolver todos los roles de un módulo', async () => {
+    mockRoles = [
       {
         dn: 'cn=admin,ou=analitica,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
         cn: 'admin',
@@ -46,25 +46,21 @@ describe("ModuleService", () => {
       {
         dn: 'cn=artista,ou=analitica,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
         cn: 'artista',
-      },
-      {
-        dn: 'ou=wallet,ou=modulos,ou=eventify_sa,dc=eventify,dc=local',
-      },
+      }
     ];
 
-    client.search.mockResolvedValue(mockModules);
+    client.search.mockResolvedValue(mockRoles);
 
-    const result = await ModuleService.getModules();
+    const result = await RoleService.getRolesByModule("analitica");
 
     expect(client.search).toHaveBeenCalled();
-    expect(result[0]).toHaveProperty('module', 'analitica');
-    expect(result[1]).toHaveProperty('module', 'wallet');
+    expect(result).toHaveProperty('module', 'analitica');
   });
 
   test('debería lanzar un error si falla la búsqueda', async () => {
     client.search.mockRejectedValue(new Error('LDAP error'));
 
-    await expect(ModuleService.getModules()).rejects.toThrow('Error in getModules Service');
+    await expect(RoleService.getRolesByModule()).rejects.toThrow('Error in getRolesByModule Service');
   });
 
 });

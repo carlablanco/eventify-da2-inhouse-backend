@@ -17,12 +17,13 @@ class ModuleService {
                 if (Object.keys(result[i]).includes("cn")) {
                     let role = result[i].cn;
                     let newModule = result[i].dn.split(',')[1].split('=')[1];
-
                     let module = modules.find(x => x.module == newModule);
+
                     if (module)
                         module.roles.push(role);
                     else
-                        module.roles = [role];
+                        if (newModule !== "modulos")
+                            modules.push({ module: newModule, roles: [role] });
                 }
                 else {
                     let newModule = result[i].dn.split(',')[0].split('=')[1];
@@ -34,7 +35,7 @@ class ModuleService {
         }
         catch (err) {
             console.log(err);
-            throw new Error("Error in getUsers Service", err);
+            throw new Error("Error in getModules Service", err.message);
         }
     }
 }
