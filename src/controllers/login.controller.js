@@ -47,7 +47,7 @@ class LoginController {
           expiresIn: "1d",
         });
 
-        //LogsModel.registerLog(user.uid, user.cn, user.modules, logTypes.LOGIN);
+        LogsModel.registerLog(user.uid, user.cn, user.modules, logTypes.LOGIN);
 
         let validModules = user.modules.map(module => module.module);
 

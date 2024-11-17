@@ -2,7 +2,7 @@ const { client } = require('../../utils/ldapConnect');
 const RoleService = require("../../services/role.service");
 
 // Habilito o deshabilito los console.error para mostrarse en la consola durante el test.
-const SHOW_CONSOLE_LOGS = true;
+const SHOW_CONSOLE_LOGS = false;
 const SHOW_CONSOLE_ERRORS = false;
 
 jest.mock('../../utils/ldapConnect', () => ({
