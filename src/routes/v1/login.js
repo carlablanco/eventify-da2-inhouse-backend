@@ -20,6 +20,11 @@
  *         required: true
  *         type: string
  *         format: password
+ *       - name: redirectUrl
+ *         description: Requested redirectUrl
+ *         in: formData
+ *         required: false
+ *         type: string
  *     responses:
  *        201:
  *           description: Created

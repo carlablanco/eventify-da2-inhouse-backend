@@ -52,11 +52,10 @@ app.use(cookieParser())
 
 app.use(cors({
   origin: ["https://moduloexterno.eventify.dev:3005",
-          "https://frontend.eventify.dev:3000",
-            "https://frontend.deliver.ar:3000",
-            "https://moduloexterno.deliver.ar:3008",
-	"https://intranet.deliver.ar/
-          
+    "https://frontend.eventify.dev:3000",
+    "https://frontend.deliver.ar:3000",
+    "https://moduloexterno.deliver.ar:3008",
+    "https://intranet.deliver.ar"
   ],
   credentials: true
 }));

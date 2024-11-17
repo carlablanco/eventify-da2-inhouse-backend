@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const UserService = require("../services/user.service");
 const AuthService = require("../services/auth.service");
 const LogsModel = require("../models/Logs");
+const UrisModel = require("../models/Uris");
 const { logTypes } = require("../config/logs");
 
 const { SECRET_KEY_JWT } = process.env;
@@ -18,7 +19,7 @@ class LoginController {
 
   async login(req, res) {
     try {
-      const { email, password, redirectUrl } = req.body;
+      const { email, password, redirectUrl = "https://intranet.deliver.ar" } = req.body;
 
       let isUserRegistered = await AuthService.ldapValidCredentials(email, password);
       console.log("LDAP-LOGIN = ", isUserRegistered);
@@ -28,11 +29,27 @@ class LoginController {
 
         console.log("LDAP-USER = ", user);
 
-        const token = jwt.sign(user, SECRET_KEY_JWT, {
+        delete user.userPassword;
+
+        const fixedUser = {
+          id: user.uid,
+          email: user.cn,
+          firstName: user.givenName,
+          lastName: user.sn,
+          phoneNumber: user.telephoneNumber,
+          province: user.st,
+          locality: user.l,
+          street: user.street,
+          modules: user.modules,
+        };
+
+        const token = jwt.sign(fixedUser, SECRET_KEY_JWT, {
           expiresIn: "1d",
         });
 
-        LogsModel.registerLog(user.uid, user.cn, user.modules, logTypes.LOGIN);
+        //LogsModel.registerLog(user.uid, user.cn, user.modules, logTypes.LOGIN);
+
+        //let redirectUrl = await UrisModel.findOne({ module: module });
 
         res.cookie('token', token, {
           httpOnly: true,     // Hace que la cookie no sea accesible desde JavaScript
@@ -44,8 +61,9 @@ class LoginController {
 
         return res.status(200).json({
           status: 200,
-          user,
+          user: fixedUser,
           token,
+          //redirectUrl: redirectUrl.uri !== "" ? redirectUrl.uri : undefined,
           message: "Token created successfully.",
         });
       }

@@ -35,7 +35,7 @@ class CheckService {
         }
     ] */
 
-    async getHealthyStatus(module) {
+    /* async getHealthyStatus(module) {
         try {
             const options = {
                 scope: "sub",
@@ -58,7 +58,7 @@ class CheckService {
             console.log(err);
             throw new Error("Error in getUsers Service", err);
         }
-    }
+    } */
 }
 
-module.exports = new RoleService();
+module.exports = new CheckService();

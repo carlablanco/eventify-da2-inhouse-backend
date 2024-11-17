@@ -7,6 +7,7 @@ const LoginController = require('../../controllers/login.controller');
 const AuthService = require('../../services/auth.service');
 const UserService = require('../../services/user.service');
 const LogsModel = require('../../models/Logs');
+const UrisModel = require('../../models/Uris');
 const jwt = require('jsonwebtoken');
 
 // Habilito o deshabilito los console.error para mostrarse en la consola durante el test.
@@ -16,6 +17,7 @@ const SHOW_CONSOLE_ERRORS = false;
 jest.mock('../../services/auth.service');
 jest.mock('../../services/user.service');
 jest.mock('../../models/Logs');
+jest.mock('../../models/Uris');
 
 describe('LoginController', () => {
   let req, res;
@@ -68,6 +70,15 @@ describe('LoginController', () => {
 
     // Mockeamos la respuesta de registerLog
     LogsModel.registerLog.mockResolvedValue(null);
+
+    // Mockeamos la respuesta de findOne redirectUrl
+    UrisModel.findOne.mockResolvedValue({
+      "_id": {
+        "$oid": "673a37111a64cfce72aab5df"
+      },
+      "module": "intranet",
+      "uri": ""
+    });
 
     // Llamamos al método login
     await LoginController.login(req, res);
