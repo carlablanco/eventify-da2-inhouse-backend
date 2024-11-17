@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const UserService = require("../services/user.service");
 const AuthService = require("../services/auth.service");
 const LogsModel = require("../models/Logs");
+const UrisModel = require("../models/Uris");
 const { logTypes } = require("../config/logs");
 
 const { SECRET_KEY_JWT } = process.env;
@@ -18,7 +19,7 @@ class LoginController {
 
   async login(req, res) {
     try {
-      const { email, password, redirectUrl } = req.body;
+      const { email, password, redirectUrl = "" } = req.body;
 
       let isUserRegistered = await AuthService.ldapValidCredentials(email, password);
       console.log("LDAP-LOGIN = ", isUserRegistered);
@@ -28,26 +29,59 @@ class LoginController {
 
         console.log("LDAP-USER = ", user);
 
-        const token = jwt.sign(user, SECRET_KEY_JWT, {
+        delete user.userPassword;
+
+        const fixedUser = {
+          id: user.uid,
+          email: user.cn,
+          firstName: user.givenName,
+          lastName: user.sn,
+          phoneNumber: user.telephoneNumber,
+          province: user.st,
+          locality: user.l,
+          street: user.street,
+          modules: user.modules,
+        };
+
+        const token = jwt.sign(fixedUser, SECRET_KEY_JWT, {
           expiresIn: "1d",
         });
 
         LogsModel.registerLog(user.uid, user.cn, user.modules, logTypes.LOGIN);
 
-        res.cookie('token', token, {
-          httpOnly: true,     // Hace que la cookie no sea accesible desde JavaScript
-          secure: true,       // En producción, asegúrate de usar `true` para HTTPS
-          domain: ".deliver.ar",
-          maxAge: 3600000,
-          sameSite: "none"     // Expira en 1 hora
+        let validModules = user.modules.map(module => module.module);
+
+        let redirectUrls = await UrisModel.find({ module: { $in: validModules } });
+
+        let authorized = false;
+        redirectUrls.forEach(module => {
+          if (redirectUrl.includes(module.uri))
+            authorized = true;
         });
 
-        return res.status(200).json({
-          status: 200,
-          user,
-          token,
-          message: "Token created successfully.",
-        });
+        if (authorized || redirectUrl === "") {
+
+          res.cookie('token', token, {
+            httpOnly: true,     // Hace que la cookie no sea accesible desde JavaScript
+            secure: true,       // En producción, asegúrate de usar `true` para HTTPS
+            domain: ".deliver.ar",
+            maxAge: 3600000,
+            sameSite: "none"     // Expira en 1 hora
+          });
+
+          return res.status(200).json({
+            status: 200,
+            user: fixedUser,
+            token,
+            //redirectUrl: redirectUrl.uri !== "" ? redirectUrl.uri : undefined,
+            message: "Token created successfully.",
+          });
+        }
+        else {
+          return res.status(401).json({
+            message: "Unauthorized.",
+          });
+        }
       }
       else {
         return res.status(401).json({

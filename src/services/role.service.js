@@ -23,7 +23,7 @@ class RoleService {
         }
         catch (err) {
             console.log(err);
-            throw new Error("Error in getUsers Service", err);
+            throw new Error("Error in getRolesByModule Service", err);
         }
     }
 }

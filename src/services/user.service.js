@@ -153,15 +153,17 @@ class UserService {
 
       let result = await client.search(LDAP_MODULES_ROUTE_OBJECT, options)
 
-      const dictionary = {};
+      const dictionary = [];
 
       for (let i = 0; i < result.length; i++) {
         let parsedModule = result[i].dn.split(",")[1].split("=")[1]
 
-        if (Object.keys(dictionary).includes(parsedModule))
-          dictionary[parsedModule].push(result[i].cn);
+        let moduleIndex = dictionary.findIndex(x => x.module === parsedModule);
+
+        if (moduleIndex >= 0)
+          dictionary[moduleIndex].roles.push(result[i].cn);
         else
-          dictionary[parsedModule] = [result[i].cn];
+          dictionary.push({ module: parsedModule, roles: [result[i].cn] });
       }
       return dictionary;
     }

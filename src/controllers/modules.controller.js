@@ -8,7 +8,6 @@ class ModuleController {
     if (!instance) {
       return new ModuleController();
     }
-    console.log("HOALAAAAAAAAAAAAAA");
     return instance;
   }
 
