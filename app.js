@@ -67,7 +67,12 @@ app.use(cors({
     "https://frontend.eventify.dev:3000",
     "https://frontend.deliver.ar:3000",
     "https://moduloexterno.deliver.ar:3008",
-    "https://intranet.deliver.ar"
+    "https://intranet.deliver.ar",
+    "https://analytics.deliver.ar",
+    "https://monitor.deliver.ar",
+    "https://eventify-sales.deliver.ar:5173",
+    "https://wallet.deliver.ar",
+    "https://pruebainhouse.deliver.ar:3000",
   ],
   credentials: true
 }));
