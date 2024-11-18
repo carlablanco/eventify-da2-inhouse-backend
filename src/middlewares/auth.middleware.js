@@ -4,35 +4,40 @@ const jwt = require("jsonwebtoken");
 const { SECRET_KEY_JWT, NODE_ENV } = process.env;
 
 const validateJwt = async (req, res = response, next) => {
+  try {
+    if (req.cookies && req.cookies.token) {
+
+      const refToken = req.cookies.token;
+
+      const validacionJwt = jwt.verify(refToken, SECRET_KEY_JWT);
+
+      if (!validacionJwt) {
+        res.status(401).json({
+          message: "Token invalido"
+        })
+
+        return;
+      }
+
+      req.usuarioSesion = jwt.decode(refToken, SECRET_KEY_JWT);
+
+      next();
 
 
 
-  if (req.cookies && req.cookies.token) {
+    } else {
 
-    const refToken = req.cookies.token;
-
-    const validacionJwt = jwt.verify(refToken, SECRET_KEY_JWT);
-
-    if (!validacionJwt) {
       res.status(401).json({
-        message: "Token invalido"
+        message: "No hay token provisto"
       })
 
-      return;
     }
-
-    req.usuarioSesion = jwt.decode(refToken, SECRET_KEY_JWT);
-
-    next();
-
-
-
-  } else {
-
-    res.status(401).json({
-      message: "No hay token provisto"
+  }
+  catch (error) {
+    console.error("Failed token validate middleware", error);
+    return res.status(401).json({
+      message: "Token invalido"
     })
-
   }
 
 };
