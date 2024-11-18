@@ -32,6 +32,6 @@ jobs:
       - name: Restart services
         run: |
           ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ubuntu@ldap.deliver.ar << 'EOF'
-          sudo systemctl restart eventify_backend
-          sudo systemctl restart eventify_ia
+          sudo systemctl restart eventify_backend.service
+          sudo systemctl restart eventify_ia.service
           EOF
