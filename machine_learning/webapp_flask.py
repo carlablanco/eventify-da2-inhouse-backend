@@ -7,6 +7,7 @@ app.config["WTF_CSRF_ENABLED"] = False
 
 @app.route("/inferir", methods=["POST"])
 def hello():
+    print("Solicitud inferencia de login recibida")
     datoBody = request.get_data()
     resultado = inferir(datoBody)
     return {"mensaje": resultado}
