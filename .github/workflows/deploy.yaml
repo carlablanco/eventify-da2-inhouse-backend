@@ -29,3 +29,9 @@ jobs:
           remote_host: ldap.deliver.ar
           remote_user: ubuntu
           remote_key: "${{ secrets.SSH_PRIVATE_KEY }}"
+      - name: Restart services
+        run: |
+          ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ubuntu@ldap.deliver.ar << 'EOF'
+          sudo systemctl restart eventify_backend
+          sudo systemctl restart eventify_ia
+          EOF
