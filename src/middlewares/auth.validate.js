@@ -3,15 +3,12 @@ const jwt = require("jsonwebtoken");
 
 const { SECRET_KEY_JWT, NODE_ENV } = process.env;
 
-const validateJwt = async (req, res = response, next) => {
+const validateJwt = async (req, res = response) => {
+  if ((req.cookies && req.cookies.token) || req.headers?.authorization) {
 
-  
+    const refToken = req.cookies.token || req.headers?.authorization;
 
-  if (req.cookies && req.cookies.token) {
-
-    const refToken = req.cookies.token;
-
-    const validacionJwt = jwt.verify(refToken,SECRET_KEY_JWT);
+    const validacionJwt = jwt.verify(refToken, SECRET_KEY_JWT);
 
     if (!validacionJwt) {
       res.status(401).json({
@@ -23,15 +20,11 @@ const validateJwt = async (req, res = response, next) => {
 
     req.usuarioSesion = jwt.decode(refToken, SECRET_KEY_JWT);
 
-    res.json(200, {
-        sesionData: req.usuarioSesion
-    })
-
-    
-    return;
-    
-
-  } else {
+    return res.status(200).json({
+      sesionData: req.usuarioSesion
+    });
+  }
+  else {
 
     res.status(401).json({
       message: "No hay token provisto"
@@ -40,7 +33,7 @@ const validateJwt = async (req, res = response, next) => {
     return;
 
   }
-  
+
 };
 
 module.exports = validateJwt;

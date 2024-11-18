@@ -48,8 +48,8 @@ logsSchema.statics.registerLog = async function (uid, username, modules, action,
         let roleId = -1;
 
         if (!(module && role)) {
-            moduleId = Object.keys(roleTypes).findIndex(m => Object.keys(modules)[0]);
-            roleId = roleTypes[Object.keys(modules)[0]].findIndex(r => modules[Object.keys(modules)[0]][0]);
+            moduleId = Object.keys(roleTypes).findIndex(m => m === modules[0].module);
+            roleId = roleTypes[modules[0].module].findIndex(r => role === modules[0].roles[0]);
         }
         else {
             moduleId = Object.keys(roleTypes).findIndex(m => module);
@@ -63,8 +63,6 @@ logsSchema.statics.registerLog = async function (uid, username, modules, action,
             hora: String(new Date().getHours()),
             dia: String(new Date().getDate()),
         };
-
-
 
         let response = await fetch(`${PYTHON_IP}/inferir`, {
             method: "POST",
@@ -80,8 +78,7 @@ logsSchema.statics.registerLog = async function (uid, username, modules, action,
     }
     catch (error) {
         Logs.insertMany({ username, modules, action, isSuspicious: true });
-        console.log(error);
-        throw new Error("Error in registerLog LogsSchema method", error);
+        console.error("Error in registerLog LogsSchema method", error);
     }
 }
 

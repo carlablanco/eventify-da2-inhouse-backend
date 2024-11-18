@@ -64,7 +64,7 @@ describe("Logs Model", () => {
 
         const uid = "user_id";
         const username = "testUser";
-        const modules = { analitica: ["admin", "artista"] };
+        const modules = [{ module: "analitica", roles: ["admin", "artista"] }];
         const action = logTypes.LOGIN;
 
         // Mock de `insertMany` en el modelo `Logs`
@@ -92,7 +92,7 @@ describe("Logs Model", () => {
 
         const uid = "user_id";
         const username = "testUser";
-        const modules = { analitica: ["admin", "artista"] };
+        const modules = [{ module: "analitica", roles: ["admin", "artista"] }];
         const action = logTypes.LOGIN;
         const module = "analitica";
         const role = "admin";
@@ -127,14 +127,14 @@ describe("Logs Model", () => {
     });
 
     test("debería marcar la acción como sospechosa si falla el fetch", async () => {
-        fetch.mockRejectedValue(new Error("Network error"));
+        await fetch.mockRejectedValue(new Error("Network error"));
 
         const uid = "user_id";
         const username = "testUser";
-        const modules = { analitica: ["admin", "artista"] };
+        const modules = [{ module: "analitica", roles: ["admin", "artista"] }];
         const action = logTypes.LOGIN;
 
-        await expect(Logs.registerLog(uid, username, modules, action)).rejects.toThrow("Error in registerLog LogsSchema method");
+        await Logs.registerLog(uid, username, modules, action);
 
         expect(mongoose.model("Logs").insertMany).toHaveBeenCalledWith(
             {
