@@ -38,15 +38,9 @@
  *  post:
  *     tags:
  *       - Login
- *     description: Validate JWT
+ *     description: Validate JWT in session cookies or in authorization header.
  *     produces:
  *       - application/json
- *     parameters:
- *        - name: jwt
- *          description: JWT token
- *          in: formData
- *          required: true
- *          type: string
  *     responses:
  *       200:
  *         description: Return all users

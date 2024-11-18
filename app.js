@@ -28,6 +28,18 @@ const swaggerOptions = {
       },
       servers: ["http://localhost:3000"],
     },
+    securityDefinitions: {
+      bearerAuth: {
+        type: "apiKey",
+        name: "Authorization", // El nombre del header donde irá el token
+        in: "header", // El token se pasa en el encabezado
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   basePath: "/",
   apis: ["./src/routes/v1/*.js"],
