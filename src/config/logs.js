@@ -3,6 +3,7 @@ const logTypes = {
     REFRESH: 'refresh',
     RESET_PASSWORD: 'resetPassword',
     LOGOUT: 'logout',
+    UNAUTHORIZED: 'unauthorized',
 };
 
 module.exports = {

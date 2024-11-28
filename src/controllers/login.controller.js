@@ -47,17 +47,21 @@ class LoginController {
           expiresIn: "1d",
         });
 
-        LogsModel.registerLog(user.uid, user.cn, user.modules, logTypes.LOGIN);
-
-        let validModules = user.modules.map(module => module.module);
+        let validModules = fixedUser.modules.map(module => module.module);
 
         let redirectUrls = await UrisModel.find({ module: { $in: validModules } });
 
         let authorized = false;
-        redirectUrls.forEach(module => {
-          if (redirectUrl.includes(module.uri))
+
+        let i = 0;
+        while (!authorized && i < redirectUrls.length) {
+          if (redirectUrl.includes(redirectUrls[i].uri))
             authorized = true;
-        });
+          else
+            i++;
+        };
+
+        LogsModel.registerLog(fixedUser.id, fixedUser.email, fixedUser.modules, authorized || redirectUrl === "" ? logTypes.LOGIN : logTypes.UNAUTHORIZED, authorized ? redirectUrls[i].module : undefined);
 
         if (authorized || redirectUrl === "") {
 

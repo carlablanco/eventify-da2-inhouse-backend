@@ -81,6 +81,7 @@ describe("Logs Model", () => {
                 modules,
                 action: logTypes.LOGIN,
                 isSuspicious: true,
+                isInfered: true,
             }
         );
     });
@@ -95,12 +96,11 @@ describe("Logs Model", () => {
         const modules = [{ module: "analitica", roles: ["admin", "artista"] }];
         const action = logTypes.LOGIN;
         const module = "analitica";
-        const role = "admin";
 
         // Mock de `insertMany` en el modelo `Logs`
         Logs.insertMany = jest.fn();
 
-        await Logs.registerLog(uid, username, modules, action, module, role);
+        await Logs.registerLog(uid, username, modules, action, module);
 
         // Verifica si fetch fue llamado con los argumentos correctos
         expect(fetch).toHaveBeenCalledWith(expect.stringContaining("inferir"), expect.any(Object));
@@ -111,8 +111,8 @@ describe("Logs Model", () => {
                 modules,
                 action: logTypes.LOGIN,
                 isSuspicious: true,
-                module,
-                role
+                isInfered: true,
+                module
             }
         );
     });
@@ -141,7 +141,8 @@ describe("Logs Model", () => {
                 username: "testUser",
                 modules,
                 action: logTypes.LOGIN,
-                isSuspicious: true, // Debería ser marcado como sospechoso
+                isSuspicious: false, // Debería ser marcado como sospechoso
+                isInfered: false,
             }
         );
     });

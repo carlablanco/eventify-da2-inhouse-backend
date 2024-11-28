@@ -21,7 +21,7 @@ const logsSchema = new Schema(
         },
         action: {
             type: String,
-            enum: [logTypes.LOGIN, logTypes.REFRESH, logTypes.RESET_PASSWORD, logTypes.LOGOUT],
+            enum: [logTypes.LOGIN, logTypes.REFRESH, logTypes.RESET_PASSWORD, logTypes.LOGOUT, logTypes.UNAUTHORIZED],
             required: true,
         },
         isSuspicious: {
@@ -39,22 +39,18 @@ const logsSchema = new Schema(
     },
 );
 
-logsSchema.statics.registerLog = async function (uid, username, modules, action, module, role) {
+logsSchema.statics.registerLog = async function (uid, username, modules, action, module) {
     if (!Object.values(logTypes).includes(action))
         throw new Error("Log action described is invalid.");
 
     try {
         let moduleId = -1;
-        let roleId = -1;
+        let roleId = 0;
 
-        if (!(module && role)) {
+        if (!module)
             moduleId = Object.keys(roleTypes).findIndex(m => m === modules[0].module);
-            roleId = roleTypes[modules[0].module].findIndex(r => role === modules[0].roles[0]);
-        }
-        else {
-            moduleId = Object.keys(roleTypes).findIndex(m => module);
-            roleId = roleTypes[module].findIndex(r => role);
-        }
+        else
+            moduleId = Object.keys(roleTypes).findIndex(m => m === module);
 
         let inferenceQuery = {
             usuario: String(uid),
@@ -71,13 +67,16 @@ logsSchema.statics.registerLog = async function (uid, username, modules, action,
 
         response = await response.json();
 
-        if (module && role)
-            Logs.insertMany({ username, modules, module, role, action, isSuspicious: response.mensaje == "1" });
+        if (module)
+            Logs.insertMany({ username, modules, module, action, isSuspicious: response.mensaje == "1", isInfered: true });
         else
-            Logs.insertMany({ username, modules, action, isSuspicious: response.mensaje == "1" });
+            Logs.insertMany({ username, modules, action, isSuspicious: response.mensaje == "1", isInfered: true });
     }
     catch (error) {
-        Logs.insertMany({ username, modules, action, isSuspicious: true });
+        if (module)
+            Logs.insertMany({ username, modules, module, action, isSuspicious: false, isInfered: false });
+        else
+            Logs.insertMany({ username, modules, action, isSuspicious: false, isInfered: false });
         console.error("Error in registerLog LogsSchema method", error);
     }
 }
