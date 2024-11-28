@@ -97,13 +97,30 @@ describe('LoginController', () => {
         email: 'test@example.com',
       }), process.env.SECRET_KEY_JWT, { expiresIn: '1d' });
     expect(LogsModel.registerLog).toHaveBeenCalled();
-    /* expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
       status: 200,
-      user: mockUser,
+      user: {
+        "email": "test@example.com",
+        "firstName": undefined,
+        "id": undefined,
+        "lastName": undefined,
+        "locality": undefined,
+        "modules": [
+          {
+            "module": "intranet",
+            "roles": [
+              "admin",
+            ],
+          },
+        ],
+        "phoneNumber": undefined,
+        "province": undefined,
+        "street": undefined,
+      },
       token: 'mocked_token',
       message: 'Token created successfully.',
-    }); */
+    });
   });
 
   test('debería devolver 401 para login no autorizado', async () => {

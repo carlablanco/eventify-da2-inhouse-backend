@@ -11,8 +11,8 @@ describe("UserService", () => {
 
   beforeEach(() => {
     mockLogs = [
-      { id: 1, username: "test@gmail.com" },
-      { id: 2, username: "test@gmail.com" },
+      { id: 1, username: "test@gmail.com", timestamp: 1 },
+      { id: 2, username: "test@gmail.com", timestamp: 2 },
     ];
 
     if (!SHOW_CONSOLE_ERRORS)
@@ -37,25 +37,25 @@ describe("UserService", () => {
   });
 
   test('debería devolver todos los logs', async () => {
-    LogsModel.find.mockResolvedValue(mockLogs); // Mockeamos la respuesta de find
+    LogsModel.find = jest.fn().mockImplementationOnce(() => ({ sort: jest.fn().mockResolvedValue(mockLogs) })); // Mockeamos la respuesta de find
 
     const result = await LogsService.getLogs();
 
-    expect(LogsModel.find).toHaveBeenCalled(); // Verifica que se llamó
+    expect(LogsModel.find).toHaveBeenCalledWith({}, { isInfered: 0 }); // Verifica que se llamó
     expect(result).toEqual(mockLogs); // Verifica que el resultado coincide con los logs simulados
   });
 
   test('debería devolver todos los logs de un usuario', async () => {
-    LogsModel.find.mockResolvedValue(mockLogs); // Mockeamos la respuesta de find
+    LogsModel.find = jest.fn().mockImplementationOnce(() => ({ sort: jest.fn().mockResolvedValue(mockLogs) })); // Mockeamos la respuesta de find
 
     const result = await LogsService.getLogs("test@gmail.com");
 
-    expect(LogsModel.find).toHaveBeenCalledWith({ username: "test@gmail.com" }); // Verifica que se llamó con el filtro correcto
+    expect(LogsModel.find).toHaveBeenCalledWith({ username: "test@gmail.com" }, { isInfered: 0 }); // Verifica que se llamó con el filtro correcto
     expect(result).toEqual(mockLogs); // Verifica que el resultado coincide con los logs simulados
   });
 
   test('simula un error de la base de datos', async () => {
-    LogsModel.find.mockRejectedValue(new Error("Internal server error")); // Mockeamos la respuesta de find
+    LogsModel.find = jest.fn().mockImplementationOnce(() => ({ sort: jest.fn().mockRejectedValue(new Error("Internal server error")) })); // Mockeamos la respuesta de find
 
     await expect(LogsService.getLogs()).rejects.toThrow("Error in getLogs Service");
 
