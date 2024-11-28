@@ -71,8 +71,13 @@ app.use(cors({
     "https://analytics.deliver.ar",
     "https://monitor.deliver.ar",
     "https://eventify-sales.deliver.ar:5173",
+    "https://eventify-sales.deliver.ar",
     "https://wallet.deliver.ar",
     "https://pruebainhouse.deliver.ar:3000",
+    "https://artists.deliver.ar",
+    "https://edamonitor.deliver.ar",
+    "https://eventify-logs.vercel.app",
+    "https://blockchain.deliver.ar",
   ],
   credentials: true
 }));
