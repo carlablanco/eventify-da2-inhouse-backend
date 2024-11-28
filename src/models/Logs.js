@@ -21,7 +21,7 @@ const logsSchema = new Schema(
         },
         action: {
             type: String,
-            enum: [logTypes.LOGIN, logTypes.REFRESH, logTypes.RESET_PASSWORD, logTypes.LOGOUT],
+            enum: [logTypes.LOGIN, logTypes.REFRESH, logTypes.RESET_PASSWORD, logTypes.LOGOUT, logTypes.UNAUTHORIZED],
             required: true,
         },
         isSuspicious: {
