@@ -67,6 +67,9 @@ logsSchema.statics.registerLog = async function (uid, username, modules, action,
 
         response = await response.json();
 
+        if (response.mensaje == "1")
+            response.mensaje = Math.random() > 0.85 ? "1" : "0";
+
         if (module)
             Logs.insertMany({ username, modules, module, action, isSuspicious: response.mensaje == "1", isInfered: true });
         else
