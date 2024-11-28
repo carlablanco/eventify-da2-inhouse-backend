@@ -3,7 +3,7 @@ const roleTypes = {
         "admin",
         "usuario",
     ],
-    crypto: [
+    blockchain: [
         "admin",
         "usuario"
     ],
