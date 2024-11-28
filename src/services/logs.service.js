@@ -6,9 +6,9 @@ class LogsService {
     try {
       let logs = [];
       if (username)
-        logs = await LogsModel.find({ username });
+        logs = await LogsModel.find({ username }).sort({ timestamp: -1 });
       else
-        logs = await LogsModel.find();
+        logs = await LogsModel.find().sort({ timestamp: -1 });
       return logs;
     }
     catch (err) {
